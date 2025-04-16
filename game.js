@@ -87,6 +87,8 @@ class StartScene extends Phaser.Scene {
   create() {
     this.objects = this.add.group();
     this.scrollSpeed = 2;
+    this.difficultyOptions = ['Easy', 'Normal', 'Hard', 'Insane'];
+    this.difficultyIndex = 1; // default: Normal
 
     this.time.addEvent({
       delay: 1000,
@@ -113,11 +115,35 @@ class StartScene extends Phaser.Scene {
       fontSize: '16px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
+    this.difficultyText = this.add.text(config.width / 2, 560,
+      'Difficulty: Normal', {
+        fontSize: '12px',
+        fill: '#ffffff',
+        fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5).setDepth(1000);
+
     this.input.keyboard.once('keydown-SPACE', () => {
-      this.scene.start('MainScene');
+      const selected = this.difficultyOptions[this.difficultyIndex];
+      this.scene.start('MainScene', { difficulty: selected });
     });
+
+    this.input.keyboard.on('keydown-LEFT', () => {
+      this.difficultyIndex = (this.difficultyIndex + 3) % 4; // gå baklänges
+      this.updateDifficultyText();
+    });
+    
+    this.input.keyboard.on('keydown-RIGHT', () => {
+      this.difficultyIndex = (this.difficultyIndex + 1) % 4;
+      this.updateDifficultyText();
+    });
+
+    this.updateDifficultyText = () => {
+      const label = this.difficultyOptions[this.difficultyIndex];
+      this.difficultyText.setText('Difficulty: ' + label);
+    };
   }
 
+  
   update() {
     this.objects.getChildren().forEach(obj => {
       obj.y -= this.scrollSpeed;
@@ -140,7 +166,7 @@ class MainScene extends Phaser.Scene {
     objectConfigs.forEach(o => this.load.image(o.sprite, `assets/${o.sprite}.png`));
   }
 
-  create() {
+  create(data) {
     this.score = 0;
     this.distance = 0;
     this.scrollSpeedY = 2;
@@ -155,6 +181,30 @@ class MainScene extends Phaser.Scene {
     this.spawnAccumulator = 0;
     this.obstacleSpawnChance = 0.05;
     this.collectibleSpawnChance = 0.03;
+
+    let obstacleSpawnChance = 0.05;
+    let collectibleSpawnChance = 0.03;
+    
+    switch (data.difficulty) {
+      case 'Easy':
+        obstacleSpawnChance = 0.03;
+        collectibleSpawnChance = 0.04;
+        break;
+      case 'Normal':
+        obstacleSpawnChance = 0.05;
+        collectibleSpawnChance = 0.03;
+        break;
+      case 'Hard':
+        obstacleSpawnChance = 0.07;
+        collectibleSpawnChance = 0.025;
+        break;
+      case 'Insane':
+        obstacleSpawnChance = 0.1;
+        collectibleSpawnChance = 0.01;
+        break;
+    }
+    this.obstacleSpawnChance = obstacleSpawnChance;
+    this.collectibleSpawnChance = collectibleSpawnChance;
 
     this.obstacles = this.add.group();
     this.collectibles = this.add.group();
