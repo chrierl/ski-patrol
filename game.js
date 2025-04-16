@@ -8,6 +8,20 @@ const objectConfigs = [
     hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 }
   },
   {
+    type: 'obstacle',
+    sprite: 'snowman',
+    scale: () => 0.15,
+    hitbox: { x: 0.2, y: 0.65, width: 0.3, height: 0.2 }
+  },
+  {
+    type: 'obstacle',
+    delay: 4500,
+    create: this.createObstacle,
+    sprite: 'rock',
+    scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
+    hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 }
+  },
+  {
     type: 'collectible',
     sprite: 'can',
     scale: () => 0.04,
@@ -25,6 +39,8 @@ class StartScene extends Phaser.Scene {
     this.load.image('tree', 'assets/tree.png');
     this.load.image('can', 'assets/can.png');
     this.load.image('skier_left', 'assets/skier_left.png');
+    this.load.image('snowman', 'assets/snowman.png');
+    this.load.image('rock', 'assets/rock.png');
   }
 
   create() {
@@ -77,7 +93,10 @@ class MainScene extends Phaser.Scene {
     this.load.image('skier', 'assets/skier.png');
     this.load.image('skier_left', 'assets/skier_left.png');
     this.load.image('skier_right', 'assets/skier_right.png');
+    this.load.image('skier_crash', 'assets/skier_crash.png');
+    this.load.image('stars', 'assets/stars.png');
     this.load.image('tree', 'assets/tree.png');
+    this.load.image('rock', 'assets/rock.png');
     this.load.image('can', 'assets/can.png');
   }
 
@@ -97,6 +116,14 @@ class MainScene extends Phaser.Scene {
     this.collectibles = this.add.group();
     this.debugGraphics = this.add.graphics();
     this.player = this.add.sprite(340, 200, 'skier').setScale(0.1);
+    this.stars = this.add.sprite(this.player.x, this.player.y - 20, 'stars')
+    .setScale(0.05)
+    .setVisible(false)
+    .setDepth(501);
+    this.crashSkier = this.add.sprite(this.player.x, this.player.y, 'skier_crash')
+      .setScale(0.1)
+      .setVisible(false)
+      .setDepth(500);    
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.timeText = this.add.text(20, 100, 'Time: 60.0s', textStyle()).setDepth(1000);
@@ -105,18 +132,44 @@ class MainScene extends Phaser.Scene {
 
     this.objectConfigs = [
       {
-        type: 'obstacle', delay: 1000, create: this.createObstacle, config: () => ({
-          sprite: 'tree',
-          scale: Phaser.Math.FloatBetween(0.10, 0.25),
-          hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 }
+        type: 'obstacle', 
+          delay: 1000, 
+          create: this.createObstacle, 
+          config: () => ({
+            sprite: 'tree',
+            scale: Phaser.Math.FloatBetween(0.10, 0.25),
+            hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 }
         })
       },
       {
-        type: 'collectible', delay: 3000, create: this.createCollectible, config: () => ({
-          sprite: 'can',
-          scale: 0.04,
-          points: 1,
-          hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 }
+        type: 'obstacle',
+        delay: 4000,
+        create: this.createObstacle,
+        config: () => ({
+          sprite: 'snowman',
+          scale: 0.12,
+          hitbox: { x: 0.2, y: 0.65, width: 0.3, height: 0.3 }
+        })
+      },
+      {
+        type: 'obstacle',
+        delay: 4500,
+        create: this.createObstacle,
+        config: () => ({
+          sprite: 'rock',
+          scale: Phaser.Math.FloatBetween(0.08, 0.12),
+          hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 }
+        })
+      },      
+      {
+        type: 'collectible', 
+          delay: 3000, 
+          create: this.createCollectible, 
+          config: () => ({
+            sprite: 'can',
+            scale: 0.04,
+            points: 1,
+            hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 }
         })
       }
     ];
@@ -191,6 +244,10 @@ class MainScene extends Phaser.Scene {
       obj.x += this.lateralSpeed;
       if (obj.y < -50) this.collectibles.remove(obj, true, true);
     });
+
+    if (this.stars.visible) {
+      this.stars.rotation += 0.1;
+    }
   }
 
   updateDistance() {
@@ -249,11 +306,21 @@ class MainScene extends Phaser.Scene {
     this.collisionDisabled = false;
     this.scrollSpeedY = 0;
     this.lateralSpeed = 0;
+
+    this.stars.setVisible(true);
+    this.crashSkier.setVisible(true);
+    this.crashSkier.setPosition(this.player.x, this.player.y);
+    this.stars.setPosition(this.player.x, this.player.y - 40);
+    this.player.setVisible(false);
+    
     setTimeout(() => {
       this.debugGraphics.clear();
       this.gamePaused = false;
       this.scrollSpeedY = 2;
       this.collisionDisabled = true;
+      this.stars.setVisible(false);
+      this.crashSkier.setVisible(false);
+      this.player.setVisible(true);
     }, 3000);
     setTimeout(() => {
       this.collisionDisabled = false;
