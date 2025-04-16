@@ -1,5 +1,21 @@
 // game.js — with correct structure/order for Phaser scene initialization
 
+const objectConfigs = [
+  {
+    type: 'obstacle',
+    sprite: 'tree',
+    scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
+    hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 }
+  },
+  {
+    type: 'collectible',
+    sprite: 'can',
+    scale: () => 0.04,
+    points: 1,
+    hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 }
+  }
+];
+
 class StartScene extends Phaser.Scene {
   constructor() {
     super({ key: 'StartScene' });
@@ -8,6 +24,7 @@ class StartScene extends Phaser.Scene {
   preload() {
     this.load.image('tree', 'assets/tree.png');
     this.load.image('can', 'assets/can.png');
+    this.load.image('skier_left', 'assets/skier_left.png');
   }
 
   create() {
@@ -17,20 +34,26 @@ class StartScene extends Phaser.Scene {
       delay: 1000,
       loop: true,
       callback: () => {
-        const sprite = Phaser.Math.RND.pick(['tree', 'can']);
-        const x = Phaser.Math.Between(50, 630);
-        const obj = this.add.sprite(x, 850, sprite).setScale(0.2);
+        const conf = Phaser.Math.RND.pick(objectConfigs);
+        const x = Phaser.Math.Between(50, config.width - 50);
+        const obj = this.add.sprite(x, config.height + 50, conf.sprite).setScale(conf.scale());
         this.objects.add(obj);
       }
     });
 
-    this.titleText = this.add.text(340, 200, 'Ski Patrol!', {
-      fontSize: '32px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5);
+    this.titleText = this.add.text(340, 150, 'Ski Patrol!', {
+      fontSize: '32px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5).setDepth(1000);
 
-    this.startText = this.add.text(340, 400, 'Press SPACE to play', {
+    const skierHeight = config.height * 0.4;
+    this.bigSkier = this.add.sprite(config.width / 2, 300, 'skier_left')
+      .setOrigin(0.5)
+      .setDisplaySize(skierHeight * 0.75, skierHeight)
+      .setDepth(1000);
+
+    this.startText = this.add.text(340, 500, 'Press SPACE to play', {
       fontSize: '16px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(1000);
 
     this.input.keyboard.once('keydown-SPACE', () => {
       this.scene.start('MainScene');
