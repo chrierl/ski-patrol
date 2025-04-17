@@ -219,7 +219,10 @@ class HighScoreScene extends Phaser.Scene {
       }
 
       displayList.forEach((entry, i) => {
-        const label = `${i + 1}. ${entry.name || '---'}  ${entry.value}`;
+        const rank = `${i + 1}.`.padStart(4, ' ');  // " 1.", "10.", etc.
+        const name = (entry.name || '---').padEnd(12, ' ');
+        const value = String(entry.value).padStart(5, ' ');
+        const label = `${rank} ${name} ${value}`;
         this.add.text(60, yOffset + 20 + i * 16, label, {
           fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
         });
