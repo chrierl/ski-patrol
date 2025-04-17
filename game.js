@@ -98,9 +98,27 @@ class StartScene extends Phaser.Scene {
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('can', 'assets/can.png');
     this.load.image('skier_left', 'assets/skier_left.png');
+    this.load.audio('music_start', 'assets/unfinished_paths.mp3');
+    this.load.audio('music_game', 'assets/ski_patrol_theme.mp3');
   }
 
   create() {
+
+    // Stop any existing music
+    if (this.sound.get('music_game')) {
+      this.sound.get('music_game').stop();
+    }
+    if (this.sound.get('music_start')) {
+      this.sound.get('music_start').stop();
+    }
+
+    // Create or reuse start music
+    if (!this.sound.get('music_start')) {
+      this.sound.add('music_start', { loop: true, volume: 0.5 });
+    }
+
+    this.sound.get('music_start').play();
+
     this.objects = this.add.group();
     this.scrollSpeed = 2;
     this.difficultyOptions = ['Easy', 'Normal', 'Hard', 'Insane'];
@@ -170,7 +188,8 @@ class StartScene extends Phaser.Scene {
 
 // HighScoreScene.js
 
-class HighScoreScene extends Phaser.Scene {
+class HighScoreScene extends Phaser.Scene {  
+
   constructor() {
     super({ key: 'HighScoreScene' });
   }
@@ -182,21 +201,16 @@ class HighScoreScene extends Phaser.Scene {
   preload() {
   }
 
-  create() {
-    this.add.text(config.width / 2, 40, 'HIGH SCORES', {
+  drawHighscoreText() {
+    this.highscoreTexts.forEach(t => t.destroy());
+    this.highscoreTexts = [];
+
+    this.highscoreTexts.push(
+    this.add.text(config.width / 2, 110, 'HIGH SCORES', {
       fontSize: '24px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5);
+    }).setOrigin(0.5));
 
-    this.categories = [
-      { key: 'distance', label: 'Meters Skied', value: Math.round(this.runData.distance / 20) },
-      { key: 'time', label: 'Time Survived', value: parseFloat((this.runData.timeMs / 1000).toFixed(1)) },
-      { key: 'points', label: 'Points Collected', value: this.runData.score }
-    ];
-
-    this.placedIn = []; // categories where player got into top 10
-    this.highscores = {};
-
-    let yOffset = 120;
+    let yOffset = 130;
 
     this.categories.forEach((cat, index) => {
       const key = `highscore_${cat.key}`;
@@ -208,9 +222,10 @@ class HighScoreScene extends Phaser.Scene {
         this.placedIn.push(cat);
       }
 
+      this.highscoreTexts.push(
       this.add.text(60, yOffset, cat.label, {
         fontSize: '14px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-      });
+      }));
 
       const displayList = [...list];
       if (place < 10) {
@@ -223,19 +238,20 @@ class HighScoreScene extends Phaser.Scene {
         const name = (entry.name || '---').padEnd(12, ' ');
         const value = String(entry.value).padStart(5, ' ');
         const label = `${rank} ${name} ${value}`;
-        this.add.text(60, yOffset + 20 + i * 16, label, {
+        this.highscoreTexts.push(this.add.text(60, yOffset + 20 + i * 16, label, {
           fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-        });
+        }));
       });
 
-      yOffset += 200;
+      yOffset += 210;
     });
 
     if (this.placedIn.length > 0) {
       this.inputText = '';
-      this.nameText = this.add.text(config.width / 2, config.height - 80, 'ENTER NAME: ', {
+      this.nameText = this.add.text(config.width / 2, config.height - 40, 'ENTER NAME: ', {
         fontSize: '14px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
       }).setOrigin(0.5);
+      this.highscoreTexts.push(this.nameText);
 
       this.input.keyboard.on('keydown', (event) => {
         if (event.key === 'Backspace') {
@@ -251,6 +267,23 @@ class HighScoreScene extends Phaser.Scene {
     } else {
       this.showContinuePrompt();
     }
+  }
+
+  create() {
+    this.highscoreTexts = [];
+
+
+
+    this.categories = [
+      { key: 'distance', label: 'Meters Skied', value: Math.round(this.runData.distance / 20) },
+      { key: 'time', label: 'Time Survived', value: parseFloat((this.runData.elapsedTimeMs / 1000).toFixed(1)) },
+      { key: 'points', label: 'Points Collected', value: this.runData.score }
+    ];
+
+    this.placedIn = []; // categories where player got into top 10
+    this.highscores = {};
+
+    this.drawHighscoreText();
   }
 
   showContinuePrompt() {
@@ -276,6 +309,19 @@ class HighScoreScene extends Phaser.Scene {
     return list.length < 10 ? list.length : 10;
   }
 
+  buildDisplayLists() {
+    this.displayLists = {};
+  
+    this.categories.forEach(cat => {
+      const key = `highscore_${cat.key}`;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+  
+      this.displayLists[cat.key] = list;  
+    });
+    this.drawHighscoreText();
+  }
+
+
   saveScores() {
     this.placedIn.forEach(cat => {
       const key = `highscore_${cat.key}`;
@@ -291,7 +337,19 @@ class HighScoreScene extends Phaser.Scene {
       if (list.length > 10) list.length = 10;
   
       localStorage.setItem(key, JSON.stringify(list));
+      this.placedIn.forEach(cat => {
+        const key = `highscore_${cat.key}`;
+        const list = JSON.parse(localStorage.getItem(key) || '[]');
+      
+        const entry = { name: this.inputText, value: cat.value };
+        const place = this.getPlacement(list, cat.value);
+        list.splice(place, 0, entry);
+        list.length = 10;
+      
+        localStorage.setItem(key, JSON.stringify(list));
+      });
     });
+    this.buildDisplayLists();
   }
 }
 
@@ -320,13 +378,22 @@ class MainScene extends Phaser.Scene {
     this.minSpeed = 2;
     this.maxSpeed = 6;
     this.elapsedTimeMs = 0;    // Always increasing — used for highscore "Time Survived"
-    this.remainingTimeMs = 5 * 1000; // Decreasing — used for game timer
+    this.remainingTimeMs = 10 * 1000; // Decreasing — used for game timer
     this.spawnAccumulator = 0;
     this.obstacleSpawnChance = 0.05;
     this.collectibleSpawnChance = 0.03;
-
     let obstacleSpawnChance = 0.05;
     let collectibleSpawnChance = 0.03;
+
+    // Stop menu music
+    if (this.sound.get('music_start')) {
+      this.sound.get('music_start').stop();
+    }
+    // Create or reuse game music
+    if (!this.sound.get('music_game')) {
+      this.sound.add('music_game', { loop: true, volume: 0.5 });
+    }
+    this.sound.get('music_game').play();
     
     switch (data.difficulty) {
       case 'Easy':
@@ -554,10 +621,22 @@ class MainScene extends Phaser.Scene {
     this.input.keyboard.once('keydown-SPACE', () => {
       this.scene.start('HighScoreScene', {
         distance: this.distance,
-        timeMs: this.timeMs,
+        elapsedTimeMs: this.elapsedTimeMs,
         score: this.score
       });
     });
+
+    // Stop game music
+    if (this.sound.get('music_game')) {
+      this.sound.get('music_game').stop();
+    }
+
+    // Start start music
+    if (!this.sound.get('music_start')) {
+      this.sound.add('music_start', { loop: true, volume: 0.5 });
+    }
+
+    this.sound.get('music_start').play();
   }
 
   createObstacle(config) {
