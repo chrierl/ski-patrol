@@ -63,13 +63,15 @@ const objectConfigs = [
     weight: 8,
     scale: () => 0.04,
     points: 1,
+    timeBonus: 1000,
     hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 },
     config() {
       return {
         sprite: this.sprite,
         scale: this.scale(),
         hitbox: this.hitbox,
-        points: this.points
+        points: this.points,
+        timeBonus: this.timeBonus
       };
     }
   }
@@ -166,6 +168,130 @@ class StartScene extends Phaser.Scene {
   }
 }
 
+// HighScoreScene.js
+
+class HighScoreScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'HighScoreScene' });
+  }
+
+  init(data) {
+    this.runData = data; // contains distance, time, score
+  }
+
+  preload() {
+  }
+
+  create() {
+    this.add.text(config.width / 2, 40, 'HIGH SCORES', {
+      fontSize: '24px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5);
+
+    this.categories = [
+      { key: 'distance', label: 'Meters Skied', value: Math.round(this.runData.distance / 10) },
+      { key: 'time', label: 'Time Survived', value: parseFloat((this.runData.timeMs / 1000).toFixed(1)) },
+      { key: 'points', label: 'Points Collected', value: this.runData.score }
+    ];
+
+    this.placedIn = []; // categories where player got into top 10
+    this.highscores = {};
+
+    let yOffset = 120;
+
+    this.categories.forEach((cat, index) => {
+      const key = `highscore_${cat.key}`;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      this.highscores[cat.key] = list;
+
+      const place = this.getPlacement(list, cat.value);
+      if (place < 10) {
+        this.placedIn.push(cat);
+      }
+
+      this.add.text(60, yOffset, cat.label, {
+        fontSize: '14px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+      });
+
+      const displayList = [...list];
+      if (place < 10) {
+        displayList.splice(place, 0, { name: '???', value: cat.value });
+        displayList.length = 10;
+      }
+
+      displayList.forEach((entry, i) => {
+        const label = `${i + 1}. ${entry.name || '---'}  ${entry.value}`;
+        this.add.text(60, yOffset + 20 + i * 16, label, {
+          fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+        });
+      });
+
+      yOffset += 200;
+    });
+
+    if (this.placedIn.length > 0) {
+      this.inputText = '';
+      this.nameText = this.add.text(config.width / 2, config.height - 80, 'ENTER NAME: ', {
+        fontSize: '14px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5);
+
+      this.input.keyboard.on('keydown', (event) => {
+        if (event.key === 'Backspace') {
+          this.inputText = this.inputText.slice(0, -1);
+        } else if (event.key.length === 1 && this.inputText.length < 12) {
+          this.inputText += event.key.toUpperCase();
+        } else if (event.key === 'Enter' || event.key === ' ') {
+          this.saveScores();
+          this.showContinuePrompt(); // new method
+        }
+        this.nameText.setText('ENTER NAME: ' + this.inputText);
+      });
+    } else {
+      this.showContinuePrompt();
+    }
+  }
+
+  showContinuePrompt() {
+    if (this.nameText) {
+      this.nameText.setVisible(false);
+    }
+  
+    this.add.text(config.width / 2, config.height - 40, 'PRESS SPACE TO RETURN', {
+      fontSize: '14px',
+      fill: '#00ffff',
+      fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5);
+  
+    this.input.keyboard.once('keydown-SPACE', () => {
+      this.scene.start('StartScene');
+    });
+  }
+
+  getPlacement(list, value) {
+    for (let i = 0; i < list.length; i++) {
+      if (value > list[i].value) return i;
+    }
+    return list.length < 10 ? list.length : 10;
+  }
+
+  saveScores() {
+    this.placedIn.forEach(cat => {
+      const key = `highscore_${cat.key}`;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+  
+      const entry = {
+        name: this.inputText,
+        value: cat.value
+      };
+  
+      const place = this.getPlacement(list, cat.value);
+      list.splice(place, 0, entry);
+      if (list.length > 10) list.length = 10;
+  
+      localStorage.setItem(key, JSON.stringify(list));
+    });
+  }
+}
+
 class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainScene' });
@@ -190,8 +316,8 @@ class MainScene extends Phaser.Scene {
     this.gameOver = false;
     this.minSpeed = 2;
     this.maxSpeed = 6;
-    this.timeMs = 0;
-    this.maxTimeMs = 60000;
+    this.elapsedTimeMs = 0;    // Always increasing — used for highscore "Time Survived"
+    this.remainingTimeMs = 5 * 1000; // Decreasing — used for game timer
     this.spawnAccumulator = 0;
     this.obstacleSpawnChance = 0.05;
     this.collectibleSpawnChance = 0.03;
@@ -305,10 +431,14 @@ class MainScene extends Phaser.Scene {
   }
 
   updateTime(delta) {
-    this.timeMs += delta;
-    const timeLeft = Math.max(0, (this.maxTimeMs - this.timeMs) / 1000);
+    this.elapsedTimeMs += delta;
+    this.remainingTimeMs -= delta;
+    
+    let timeLeft = Math.max(0, this.remainingTimeMs / 1000);
     this.timeText.setText('Time: ' + timeLeft.toFixed(1) + 's');
-    if (timeLeft <= 0 && !this.gameOver) {
+    
+    if (this.remainingTimeMs <= 0 && !this.gameOver) {
+      this.gameOver = true;
       this.endGame();
     }
   }
@@ -343,9 +473,22 @@ class MainScene extends Phaser.Scene {
         obj.displayHeight * box.height
       );
       if (!this.gamePaused && Phaser.Geom.Intersects.RectangleToRectangle(skierBounds, bounds)) {
-        this.score += obj.points;
-        obj.destroy();
+        this.score += obj.points || 0;
         this.scoreText.setText('Cans: ' + this.score);
+        console.log(`⏱️ +${obj.timeBonus / 1000}s time bonus 1`);      
+      
+        // ✅ Time bonus from collectible
+        if (obj.timeBonus) {
+          this.remainingTimeMs += obj.timeBonus;
+          // Optional visual feedback
+          this.timeText.setColor('#00ff00');
+          this.time.delayedCall(300, () => {
+            this.timeText.setColor('#ffffff');
+          });
+          console.log(`⏱️ +${obj.timeBonus / 1000}s time bonus 2`);
+        }
+      
+        obj.destroy(); // ❗ Call this last so we still have access to the bonus
       }
     });
   }
@@ -406,7 +549,11 @@ class MainScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1001);
 
     this.input.keyboard.once('keydown-SPACE', () => {
-      this.scene.start('StartScene');
+      this.scene.start('HighScoreScene', {
+        distance: this.distance,
+        timeMs: this.timeMs,
+        score: this.score
+      });
     });
   }
 
@@ -423,6 +570,7 @@ class MainScene extends Phaser.Scene {
     const sprite = this.add.sprite(x, config.height, config.sprite);
     sprite.setScale(config.scale);
     sprite.points = config.points;
+    sprite.timeBonus = config.timeBonus;
     sprite.customHitbox = config.hitbox;
     this.collectibles.add(sprite);
   }
@@ -440,9 +588,11 @@ const config = {
     default: 'arcade',
     arcade: { gravity: { y: 200 }, debug: false }
   },
-  scene: [StartScene, MainScene]
+  scene: [StartScene, MainScene, HighScoreScene]
 };
 
 window.startGame = function () {
   new Phaser.Game(config);
 };
+
+
