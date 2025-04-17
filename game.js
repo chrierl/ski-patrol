@@ -196,6 +196,7 @@ class HighScoreScene extends Phaser.Scene {
 
   init(data) {
     this.runData = data; // contains distance, time, score
+    this.displayLists = {};
   }
 
   preload() {
@@ -228,7 +229,7 @@ class HighScoreScene extends Phaser.Scene {
       }));
 
       const displayList = [...list];
-      if (place < 10) {
+      if (place < 10 && !this.inputText) {
         displayList.splice(place, 0, { name: '???', value: cat.value });
         displayList.length = 10;
       }
@@ -260,7 +261,7 @@ class HighScoreScene extends Phaser.Scene {
           this.inputText += event.key.toUpperCase();
         } else if (event.key === 'Enter' || event.key === ' ') {
           this.saveScores();
-          this.showContinuePrompt(); // new method
+          this.showContinuePrompt();
         }
         this.nameText.setText('ENTER NAME: ' + this.inputText);
       });
@@ -321,7 +322,6 @@ class HighScoreScene extends Phaser.Scene {
     this.drawHighscoreText();
   }
 
-
   saveScores() {
     this.placedIn.forEach(cat => {
       const key = `highscore_${cat.key}`;
@@ -332,25 +332,24 @@ class HighScoreScene extends Phaser.Scene {
         value: cat.value
       };
   
-      const place = this.getPlacement(list, cat.value);
-      list.splice(place, 0, entry);
+      // ✅ Look for an existing '???' entry with same value
+      const existingIndex = list.findIndex(e => e.name === '???' && e.value === cat.value);
+  
+      if (existingIndex !== -1) {
+        list[existingIndex] = entry; // ✅ Replace placeholder
+      } else {
+        const place = this.getPlacement(list, cat.value);
+        list.splice(place, 0, entry);
+      }
+  
       if (list.length > 10) list.length = 10;
   
       localStorage.setItem(key, JSON.stringify(list));
-      this.placedIn.forEach(cat => {
-        const key = `highscore_${cat.key}`;
-        const list = JSON.parse(localStorage.getItem(key) || '[]');
-      
-        const entry = { name: this.inputText, value: cat.value };
-        const place = this.getPlacement(list, cat.value);
-        list.splice(place, 0, entry);
-        list.length = 10;
-      
-        localStorage.setItem(key, JSON.stringify(list));
-      });
     });
-    this.buildDisplayLists();
+  
+    this.buildDisplayLists(); // ✅ Refresh display with actual data
   }
+  
 }
 
 class MainScene extends Phaser.Scene {
