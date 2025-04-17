@@ -4,9 +4,9 @@ const objectConfigs = [
   {
     type: 'obstacle',
     sprite: 'tree',
-    weight: 25,
+    weight: 30,
     scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
-    hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 },
+    hitbox: { x: 0.3, y: 0.65, width: 0.4, height: 0.30 },
     config() {
       return {
         sprite: this.sprite,
@@ -20,7 +20,7 @@ const objectConfigs = [
     sprite: 'rock',
     weight: 8,
     scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
-    hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 },
+    hitbox: { x: 0.25, y: 0.5, width: 0.5, height: 0.3 },
     config() {
       return {
         sprite: this.sprite,
@@ -32,9 +32,9 @@ const objectConfigs = [
   {
     type: 'obstacle',
     sprite: 'snowman',
-    weight: 2,
+    weight: 4,
     scale: () => 0.12,
-    hitbox: { x: 0.2, y: 0.65, width: 0.3, height: 0.3 },
+    hitbox: { x: 0.3, y: .4, width: 0.4, height: 0.5 },
     config() {
       return {
         sprite: this.sprite,
@@ -46,14 +46,68 @@ const objectConfigs = [
   {
     type: 'obstacle',
     sprite: 'groomer',
-    weight: 1, // tweak for rarity
+    weight: 2, // tweak for rarity
     scale: () => 0.20,
-    hitbox: { x: 0.2, y: 0.65, width: 0.4, height: 0.3 },
+    hitbox: { x: 0.05, y: 0.4, width: 0.9, height: 0.35 },
     config() {
       return {
         sprite: this.sprite,
         scale: this.scale(),
         hitbox: this.hitbox
+      };
+    }
+  },
+  {
+    type: 'obstacle',
+    sprite: 'simon',
+    weight: 1, // tweak for rarity
+    scale: () => 0.08,
+    hitbox: { x: 0.2, y: 0.5, width: 0.6, height: 0.5 },
+    config() {
+      return {
+        sprite: this.sprite,
+        scale: this.scale(),
+        hitbox: this.hitbox
+      };
+    }
+  },
+  {
+    type: 'collectible',
+    sprite: 'bottle',
+    weight: 4,
+    scale: () => 0.04,
+    points: 2,
+    timeBonus: 2000,
+    hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 },
+    rotation: 50,
+    config() {
+      return {
+        sprite: this.sprite,
+        scale: this.scale(),
+        hitbox: this.hitbox,
+        points: this.points,
+        timeBonus: this.timeBonus,
+        rotation: this.rotation
+      };
+    }
+  },
+  {
+    type: 'collectible',
+    sprite: 'pole',
+    weight: 2,
+    scale: () => 0.04,
+    points: 3,
+    timeBonus: 2000,
+    hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 },
+    rotation: 120,
+    config() {
+      return {
+        sprite: this.sprite,
+        scale: this.scale(),
+        hitbox: this.hitbox,
+        points: this.points,
+        timeBonus: this.timeBonus,
+        rotation: this.rotation
       };
     }
   },
@@ -65,13 +119,15 @@ const objectConfigs = [
     points: 1,
     timeBonus: 1000,
     hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 },
+    rotation: 60,
     config() {
       return {
         sprite: this.sprite,
         scale: this.scale(),
         hitbox: this.hitbox,
         points: this.points,
-        timeBonus: this.timeBonus
+        timeBonus: this.timeBonus,
+        rotation: this.rotation
       };
     }
   }
@@ -96,10 +152,14 @@ class StartScene extends Phaser.Scene {
     this.load.image('tree', 'assets/tree.png');
     this.load.image('rock', 'assets/rock.png');
     this.load.image('snowman', 'assets/snowman.png');
+    this.load.image('simon', 'assets/simon.png'); 
     this.load.image('can', 'assets/can.png');
+    this.load.image('bottle', 'assets/bottle.png');
+    this.load.image('pole', 'assets/pole.png');
     this.load.image('skier_left', 'assets/skier_left.png');
     this.load.audio('music_start', 'assets/unfinished_paths.mp3');
     this.load.audio('music_game', 'assets/ski_patrol_theme.mp3');
+    this.load.audio('pickup', 'assets/pickup.wav');
   }
 
   create() {
@@ -375,7 +435,7 @@ class MainScene extends Phaser.Scene {
     this.gamePaused = false;
     this.gameOver = false;
     this.minSpeed = 2;
-    this.maxSpeed = 6;
+    this.maxSpeed = 10;
     this.elapsedTimeMs = 0;    // Always increasing — used for highscore "Time Survived"
     this.remainingTimeMs = 30 * 1000; // Decreasing — used for game timer
     this.spawnAccumulator = 0;
@@ -383,6 +443,8 @@ class MainScene extends Phaser.Scene {
     this.collectibleSpawnChance = 0.03;
     let obstacleSpawnChance = 0.05;
     let collectibleSpawnChance = 0.03;
+
+    this.pickupSound = this.sound.add('pickup');
 
     // Stop menu music
     if (this.sound.get('music_start')) {
@@ -396,20 +458,20 @@ class MainScene extends Phaser.Scene {
     
     switch (data.difficulty) {
       case 'Easy':
-        obstacleSpawnChance = 0.03;
-        collectibleSpawnChance = 0.04;
+        obstacleSpawnChance = 0.05;
+        collectibleSpawnChance = 0.05;
         break;
       case 'Normal':
-        obstacleSpawnChance = 0.05;
-        collectibleSpawnChance = 0.03;
+        obstacleSpawnChance = 0.07;
+        collectibleSpawnChance = 0.05;
         break;
       case 'Hard':
-        obstacleSpawnChance = 0.07;
-        collectibleSpawnChance = 0.025;
+        obstacleSpawnChance = 0.10;
+        collectibleSpawnChance = 0.04;
         break;
       case 'Insane':
-        obstacleSpawnChance = 0.12;
-        collectibleSpawnChance = 0.02;
+        obstacleSpawnChance = 0.15;
+        collectibleSpawnChance = 0.03;
         break;
     }
     this.obstacleSpawnChance = obstacleSpawnChance;
@@ -425,7 +487,7 @@ class MainScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.timeText = this.add.text(20, 100, 'Time: 60.0s', textStyle()).setDepth(1000);
-    this.scoreText = this.add.text(20, 120, 'Cans: 0', textStyle()).setDepth(1000);
+    this.scoreText = this.add.text(20, 120, 'Pickups: 0', textStyle()).setDepth(1000);
     this.distanceText = this.add.text(20, 140, 'Distance: 0', textStyle()).setDepth(1000);
   }
 
@@ -485,17 +547,22 @@ class MainScene extends Phaser.Scene {
   spawnObjectsContinuously() {
     const obstacleDefs = objectConfigs.filter(o => o.type === 'obstacle');
     const collectibleDefs = objectConfigs.filter(o => o.type === 'collectible');
-    
-    if (Phaser.Math.FloatBetween(0, 1) < this.obstacleSpawnChance) {
-      const conf = weightedPick(obstacleDefs).config();
-      conf.height = Phaser.Math.Between(config.height + 50, config.height + 150);
-      this.createObstacle(conf);
-    }
-    
-    if (Phaser.Math.FloatBetween(0, 1) < this.collectibleSpawnChance) {
-      const conf = weightedPick(collectibleDefs).config();
-      conf.height = Phaser.Math.Between(config.height + 50, config.height + 150);
-      this.createCollectible(conf);
+  
+    const spawnInterval = 5; // spawn check every 20 pixels
+    while (this.spawnAccumulator >= spawnInterval) {
+      this.spawnAccumulator -= spawnInterval;
+  
+      if (Phaser.Math.FloatBetween(0, 1) < this.obstacleSpawnChance) {
+        const conf = weightedPick(obstacleDefs).config();
+        conf.height = Phaser.Math.Between(config.height + 50, config.height + 150);
+        this.createObstacle(conf);
+      }
+  
+      if (Phaser.Math.FloatBetween(0, 1) < this.collectibleSpawnChance) {
+        const conf = weightedPick(collectibleDefs).config();
+        conf.height = Phaser.Math.Between(config.height + 50, config.height + 150);
+        this.createCollectible(conf);
+      }
     }
   }
 
@@ -523,12 +590,18 @@ class MainScene extends Phaser.Scene {
     this.obstacles.getChildren().forEach(obj => {
       const box = obj.customHitbox;
       const bounds = new Phaser.Geom.Rectangle(
-        obj.x - obj.displayWidth * box.x,
+        obj.x - obj.displayWidth / 2 + obj.displayWidth * box.x,
         obj.y - obj.displayHeight / 2 + obj.displayHeight * box.y,
         obj.displayWidth * box.width,
         obj.displayHeight * box.height
       );
       if (!this.collisionDisabled && !this.gamePaused && Phaser.Geom.Intersects.RectangleToRectangle(skierBounds, bounds)) {
+        // Draw skier's hitbox (green)
+        this.debugGraphics = this.add.graphics().setDepth(9999);
+        this.debugGraphics.lineStyle(3, 0x00ff00); // green
+        this.debugGraphics.strokeRect(skierBounds.x, skierBounds.y, skierBounds.width, skierBounds.height);
+        this.debugGraphics.lineStyle(3, 0xff0000); // red
+        this.debugGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
         this.triggerPause();
       }
     });
@@ -543,9 +616,10 @@ class MainScene extends Phaser.Scene {
       );
       if (!this.gamePaused && Phaser.Geom.Intersects.RectangleToRectangle(skierBounds, bounds)) {
         this.score += obj.points || 0;
-        this.scoreText.setText('Cans: ' + this.score);
-        console.log(`⏱️ +${obj.timeBonus / 1000}s time bonus 1`);      
-      
+        this.scoreText.setText('Pickups: ' + this.score);
+        this.pickupSound.play({ volume: 1 });
+        console.log(`⏱️ +${obj.timeBonus / 1000}s time bonus 1`);            
+
         // ✅ Time bonus from collectible
         if (obj.timeBonus) {
           this.remainingTimeMs += obj.timeBonus;
@@ -591,7 +665,7 @@ class MainScene extends Phaser.Scene {
         }
       });
 
-    }, 3000);
+    }, 2000);
 
     setTimeout(() => {
       this.collisionDisabled = false;
@@ -600,7 +674,7 @@ class MainScene extends Phaser.Scene {
         this.blinkTimer = null;
       }
       this.player.setVisible(true);
-    }, 6000);
+    }, 5000);
   }
 
   endGame() {
@@ -650,6 +724,10 @@ class MainScene extends Phaser.Scene {
     const x = Phaser.Math.Between(50, config.width || config.widthRange?.[1] || 630);
     const sprite = this.add.sprite(x, config.height, config.sprite);
     sprite.setScale(config.scale);
+    if (config.rotation) {
+      const angleDeg = Phaser.Math.Between(-config.rotation, config.rotation);
+      sprite.setAngle(angleDeg);
+    }
     sprite.points = config.points;
     sprite.timeBonus = config.timeBonus;
     sprite.customHitbox = config.hitbox;
