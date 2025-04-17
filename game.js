@@ -188,7 +188,7 @@ class HighScoreScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.categories = [
-      { key: 'distance', label: 'Meters Skied', value: Math.round(this.runData.distance / 10) },
+      { key: 'distance', label: 'Meters Skied', value: Math.round(this.runData.distance / 20) },
       { key: 'time', label: 'Time Survived', value: parseFloat((this.runData.timeMs / 1000).toFixed(1)) },
       { key: 'points', label: 'Points Collected', value: this.runData.score }
     ];
@@ -410,7 +410,7 @@ class MainScene extends Phaser.Scene {
   updateDistance() {
     if (!this.gamePaused) {
       this.distance += this.scrollSpeedY;
-      this.distanceText.setText('Distance: ' + Math.round(this.distance));
+      this.distanceText.setText('Distance: ' + Math.round(this.distance / 20) + ' m');
       this.spawnAccumulator += this.scrollSpeedY;
       this.spawnObjectsContinuously();
     }
@@ -547,7 +547,7 @@ class MainScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1001);
 
     this.add.text(config.width / 2, config.height / 2 + 60,
-      `Height: ${Math.round(this.distance)}\nCans: ${this.score}`, {
+      `Distance: ${Math.round(this.distance / 20)} m\nCollected: ${this.score}`, {
         fontSize: '24px', fill: '#ffffff', fontFamily: '"Press Start 2P"', align: 'center'
     }).setOrigin(0.5).setDepth(1001);
 
