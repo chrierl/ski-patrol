@@ -137,7 +137,7 @@ class StartScene extends Phaser.Scene {
     });
 
     this.titleText = this.add.text(config.width / 2, 200, 'Ski Patrol!', {
-      fontSize: '32px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+      fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
     this.bigSkier = this.add.sprite(config.width / 2, 300, 'skier_left')
@@ -146,13 +146,13 @@ class StartScene extends Phaser.Scene {
       .setDepth(1000);
 
     this.startText = this.add.text(config.width / 2, 500, 'Press SPACE to play', {
-      fontSize: '16px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+      fontSize: '16px', fill: '#020202', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
     this.difficultyText = this.add.text(config.width / 2, 560,
       'Difficulty: Normal', {
         fontSize: '12px',
-        fill: '#ffffff',
+        fill: '#020202',
         fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
@@ -208,7 +208,7 @@ class HighScoreScene extends Phaser.Scene {
 
     this.highscoreTexts.push(
     this.add.text(config.width / 2, 110, 'HIGH SCORES', {
-      fontSize: '24px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+      fontSize: '24px', fill: '#E34234', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5));
 
     let yOffset = 130;
@@ -225,7 +225,7 @@ class HighScoreScene extends Phaser.Scene {
 
       this.highscoreTexts.push(
       this.add.text(60, yOffset, cat.label, {
-        fontSize: '14px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+        fontSize: '14px', fill: '#020202', fontFamily: '"Press Start 2P"'
       }));
 
       const displayList = [...list];
@@ -240,7 +240,7 @@ class HighScoreScene extends Phaser.Scene {
         const value = String(entry.value).padStart(5, ' ');
         const label = `${rank} ${name} ${value}`;
         this.highscoreTexts.push(this.add.text(60, yOffset + 20 + i * 16, label, {
-          fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+          fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
         }));
       });
 
@@ -250,7 +250,7 @@ class HighScoreScene extends Phaser.Scene {
     if (this.placedIn.length > 0) {
       this.inputText = '';
       this.nameText = this.add.text(config.width / 2, config.height - 40, 'ENTER NAME: ', {
-        fontSize: '14px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+        fontSize: '14px', fill: '#020202', fontFamily: '"Press Start 2P"'
       }).setOrigin(0.5);
       this.highscoreTexts.push(this.nameText);
 
@@ -294,7 +294,7 @@ class HighScoreScene extends Phaser.Scene {
   
     this.add.text(config.width / 2, config.height - 40, 'PRESS SPACE TO RETURN', {
       fontSize: '14px',
-      fill: '#00ffff',
+      fill: '#020202',
       fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5);
   
@@ -377,7 +377,7 @@ class MainScene extends Phaser.Scene {
     this.minSpeed = 2;
     this.maxSpeed = 6;
     this.elapsedTimeMs = 0;    // Always increasing — used for highscore "Time Survived"
-    this.remainingTimeMs = 10 * 1000; // Decreasing — used for game timer
+    this.remainingTimeMs = 30 * 1000; // Decreasing — used for game timer
     this.spawnAccumulator = 0;
     this.obstacleSpawnChance = 0.05;
     this.collectibleSpawnChance = 0.03;
@@ -550,9 +550,9 @@ class MainScene extends Phaser.Scene {
         if (obj.timeBonus) {
           this.remainingTimeMs += obj.timeBonus;
           // Optional visual feedback
-          this.timeText.setColor('#00ff00');
-          this.time.delayedCall(300, () => {
-            this.timeText.setColor('#ffffff');
+          this.timeText.setColor('#E34234');
+          this.time.delayedCall(500, () => {
+            this.timeText.setColor('#020202');
           });
           console.log(`⏱️ +${obj.timeBonus / 1000}s time bonus 2`);
         }
@@ -609,12 +609,12 @@ class MainScene extends Phaser.Scene {
     this.lateralSpeed = 0;
 
     this.add.text(config.width / 2, config.height / 2, 'GAME OVER', {
-      fontSize: '48px', fill: '#ffff00', fontFamily: '"Press Start 2P"'
+      fontSize: '48px', fill: '#E34234', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1001);
 
     this.add.text(config.width / 2, config.height / 2 + 60,
       `Distance: ${Math.round(this.distance / 20)} m\nCollected: ${this.score}`, {
-        fontSize: '24px', fill: '#ffffff', fontFamily: '"Press Start 2P"', align: 'center'
+        fontSize: '24px', fill: '#020202', fontFamily: '"Press Start 2P"', align: 'center'
     }).setOrigin(0.5).setDepth(1001);
 
     this.input.keyboard.once('keydown-SPACE', () => {
@@ -658,11 +658,12 @@ class MainScene extends Phaser.Scene {
 }
 
 function textStyle() {
-  return { fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"' };
+  return { fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"' };
 }
 
 const config = {
   type: Phaser.AUTO,
+  backgroundColor: '#FFF5EE',
   width: 680,
   height: 800,
   physics: {
