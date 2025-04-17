@@ -482,7 +482,7 @@ class MainScene extends Phaser.Scene {
     this.debugGraphics = this.add.graphics();
     this.player = this.add.sprite(config.width / 2, 200, 'skier').setScale(0.1).setDepth(500);
     this.crashSkier = this.add.sprite(this.player.x, this.player.y, 'skier_crash').setScale(0.1).setVisible(false).setDepth(500);
-    this.stars = this.add.sprite(this.player.x, this.player.y - 20, 'stars').setScale(0.15).setVisible(false).setDepth(501);
+    this.stars = this.add.sprite(this.player.x, this.player.y - 20, 'stars').setScale(0.08).setVisible(false).setDepth(501);
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -597,11 +597,11 @@ class MainScene extends Phaser.Scene {
       );
       if (!this.collisionDisabled && !this.gamePaused && Phaser.Geom.Intersects.RectangleToRectangle(skierBounds, bounds)) {
         // Draw skier's hitbox (green)
-        this.debugGraphics = this.add.graphics().setDepth(9999);
+        /*this.debugGraphics = this.add.graphics().setDepth(9999);
         this.debugGraphics.lineStyle(3, 0x00ff00); // green
         this.debugGraphics.strokeRect(skierBounds.x, skierBounds.y, skierBounds.width, skierBounds.height);
         this.debugGraphics.lineStyle(3, 0xff0000); // red
-        this.debugGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        this.debugGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height); */
         this.triggerPause();
       }
     });
