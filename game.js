@@ -4,7 +4,7 @@ const objectConfigs = [
   {
     type: 'obstacle',
     sprite: 'tree',
-    weight: 20,
+    weight: 25,
     scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
     hitbox: { x: 0.15, y: 0.70, width: 0.3, height: 0.25 },
     config() {
@@ -32,9 +32,23 @@ const objectConfigs = [
   {
     type: 'obstacle',
     sprite: 'snowman',
-    weight: 1,
+    weight: 2,
     scale: () => 0.12,
     hitbox: { x: 0.2, y: 0.65, width: 0.3, height: 0.3 },
+    config() {
+      return {
+        sprite: this.sprite,
+        scale: this.scale(),
+        hitbox: this.hitbox
+      };
+    }
+  },
+  {
+    type: 'obstacle',
+    sprite: 'groomer',
+    weight: 1, // tweak for rarity
+    scale: () => 0.20,
+    hitbox: { x: 0.2, y: 0.65, width: 0.4, height: 0.3 },
     config() {
       return {
         sprite: this.sprite,
@@ -199,8 +213,8 @@ class MainScene extends Phaser.Scene {
         collectibleSpawnChance = 0.025;
         break;
       case 'Insane':
-        obstacleSpawnChance = 0.1;
-        collectibleSpawnChance = 0.01;
+        obstacleSpawnChance = 0.12;
+        collectibleSpawnChance = 0.02;
         break;
     }
     this.obstacleSpawnChance = obstacleSpawnChance;
@@ -255,6 +269,11 @@ class MainScene extends Phaser.Scene {
     [...this.obstacles.getChildren(), ...this.collectibles.getChildren()].forEach(obj => {
       obj.y -= this.scrollSpeedY;
       obj.x += this.lateralSpeed;
+      if (obj.y > this.player.y) {
+        obj.setDepth(600);
+      } else {
+        obj.setDepth(400);
+      }
       if (obj.y < -50) obj.destroy();
     });
   }
@@ -351,10 +370,24 @@ class MainScene extends Phaser.Scene {
       this.stars.setVisible(false);
       this.crashSkier.setVisible(false);
       this.player.setVisible(true);
+
+      this.blinkTimer = this.time.addEvent({
+        delay: 200,
+        loop: true,
+        callback: () => {
+          this.player.visible = !this.player.visible;
+        }
+      });
+
     }, 3000);
 
     setTimeout(() => {
       this.collisionDisabled = false;
+      if (this.blinkTimer) {
+        this.blinkTimer.remove(false);
+        this.blinkTimer = null;
+      }
+      this.player.setVisible(true);
     }, 6000);
   }
 
@@ -381,6 +414,7 @@ class MainScene extends Phaser.Scene {
     const x = Phaser.Math.Between(50, config.width || config.widthRange?.[1] || 630);
     const sprite = this.add.sprite(x, config.height, config.sprite);    sprite.setScale(config.scale);
     sprite.customHitbox = config.hitbox;
+    sprite.setDepth(400);
     this.obstacles.add(sprite);
   }
 
