@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Ski Patrol</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">  <title>Ski Patrol</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
@@ -12,17 +13,28 @@
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 
-  <!-- Fix for mobile viewport height -->
-  <script>
-    function updateViewportHeight() {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
-
-    window.addEventListener('resize', updateViewportHeight);
-    window.addEventListener('orientationchange', updateViewportHeight);
-    window.addEventListener('load', updateViewportHeight);
-    updateViewportHeight();
+  <script type="module">
+    import config from './game.js';
+  
+    WebFont.load({
+      google: {
+        families: ['Press Start 2P']
+      },
+      active: () => {
+        // Justera canvasstorlek före spelstart
+        const resize = () => {
+          const canvas = document.querySelector('canvas');
+          if (canvas) {
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+          }
+        };
+  
+        window.addEventListener('resize', resize);
+        resize(); // kalla direkt
+        new Phaser.Game(config);
+      }
+    });
   </script>
 </head>
 

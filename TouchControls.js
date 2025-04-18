@@ -49,11 +49,11 @@ export function addTouchControls(scene) {
     const xRight = screenW - margin - size / 2;
     const xLeftControl = xRight - size - margin;
   
-    createButton(xLeftControl, yControls, '<',
+    createButton(xLeftControl, yControls, 'L',
       () => { scene.touchLeft = true; },
       () => { scene.touchLeft = false; });
   
-    createButton(xRight, yControls, '>',
+    createButton(xRight, yControls, 'R',
       () => { scene.touchRight = true; },
       () => { scene.touchRight = false; });
   
