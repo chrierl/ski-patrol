@@ -29,6 +29,8 @@ export default class MainScene extends Phaser.Scene {
     this.distance = 0;
     this.scrollSpeedY = 2;
     this.lateralSpeed = 0;
+    this.touchDirection = 0; // -1 for left, 0 for straight, 1 for right
+    this.touchSpeedChange = 0; // -1 for slower, 0 for same, 1 for faster   
     this.collisionDisabled = false;
     this.gamePaused = false;
     this.gameOver = false;
@@ -85,29 +87,34 @@ export default class MainScene extends Phaser.Scene {
 
 update(time, delta) {
     if (this.gameOver) return;
-  
+    
     this.lateralSpeed = 0;
-  
     if (!this.gamePaused) {
-        // Left/right control (keyboard OR touch)
-        if (this.cursors.left.isDown || this.touchLeft) {
+        // Horizontal
+        if (this.cursors.left.isDown) {
           this.player.setTexture('skier_left');
           this.lateralSpeed = 1.5;
-        } else if (this.cursors.right.isDown || this.touchRight) {
+        } else if (this.cursors.right.isDown) {
+          this.player.setTexture('skier_right');
+          this.lateralSpeed = -1.5;
+        } else if (this.touchDirection === -1) {
+          this.player.setTexture('skier_left');
+          this.lateralSpeed = 1.5;
+        } else if (this.touchDirection === 1) {
           this.player.setTexture('skier_right');
           this.lateralSpeed = -1.5;
         } else {
           this.player.setTexture('skier');
+          this.lateralSpeed = 0;
         }
       
-        // Up/down speed control (keyboard only)
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
-          this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 1);
+        // Vertical (speed)
+        if (this.cursors.up.isDown || this.touchSpeedChange === -1) {
+          this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 0.05);
+        } else if (this.cursors.down.isDown || this.touchSpeedChange === 1) {
+          this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 0.05);
         }
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
-          this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 1);
-        }
-    }
+      }
   
     this.moveObjects();
     this.updateDistance();

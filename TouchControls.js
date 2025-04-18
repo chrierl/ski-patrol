@@ -2,63 +2,81 @@ export function addTouchControls(scene) {
     const screenW = scene.scale.width;
     const screenH = scene.scale.height;
   
-    const sizeW = screenW * 0.15;
-    const sizeH = screenH * 0.15;
-    const size = Math.min(sizeW, sizeH);
-    const margin = 20;
+    const size = Math.min(screenW, screenH) * 0.12;
+    const gap = size * 0.2;
+    const totalWidth = size * 3 + gap * 2;
+    const totalHeight = size * 3 + gap * 2;
+  
+    const startX = (screenW - totalWidth) / 2;
+    const startY = screenH - totalHeight - 20;
   
     const style = {
-      fontSize: `${size * 0.5}px`,
+      fontSize: `${size * 0.4}px`,
       fill: '#ffffff',
       fontFamily: '"Press Start 2P"',
       align: 'center'
     };
   
-    scene.touchLeft = false;
-    scene.touchRight = false;
+    const buttonAreas = [];
   
-    const createButton = (x, y, label, onDown, onUp = () => {}) => {
-      const bg = scene.add.rectangle(x, y, size, size, 0x000000, 0.4)
+    const createButton = (col, row, label, direction, speedChange) => {
+      const x = startX + col * (size + gap) + size / 2;
+      const y = startY + row * (size + gap) + size / 2;
+  
+      scene.add.rectangle(x, y, size, size, 0x000000, 0.4)
         .setOrigin(0.5)
         .setStrokeStyle(2, 0xffffff)
         .setDepth(1000);
-      const text = scene.add.text(x, y, label, style)
+      scene.add.text(x, y, label, style)
         .setOrigin(0.5)
         .setDepth(1001);
   
-      bg.setInteractive({ useHandCursor: true });
-      bg.on('pointerdown', onDown);
-      bg.on('pointerup', onUp);
-  
-      return { bg, text };
+      // Save button area for pointer tracking
+      buttonAreas.push({
+        rect: new Phaser.Geom.Rectangle(x - size/2, y - size/2, size, size),
+        direction,
+        speedChange
+      });
     };
   
-    const xLeft = margin + size / 2;
-    const safeBottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sat')) || 0;
-    const yDown = screenH - margin - size / 2 - safeBottom;
+    // Grid: row (Y), col (X)
+    createButton(0, 0, '↖', -1, -1);
+    createButton(1, 0, '↑',  0, -1);
+    createButton(2, 0, '↗',  1, -1);
   
-    createButton(xLeft, yDown - size - margin, '↑', () => {
-      scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1);
+    createButton(0, 1, '←', -1,  0);
+    createButton(1, 1, '•',  0,  0);
+    createButton(2, 1, '→',  1,  0);
+  
+    createButton(0, 2, '↙', -1,  1);
+    createButton(1, 2, '↓',  0,  1);
+    createButton(2, 2, '↘',  1,  1);
+  
+    // 🧠 Handle pointer drag movement
+    scene.input.on('pointermove', pointer => {
+      if (!pointer.isDown) return;
+      const x = pointer.x;
+      const y = pointer.y;
+  
+      let matched = false;
+      for (const btn of buttonAreas) {
+        if (Phaser.Geom.Rectangle.Contains(btn.rect, x, y)) {
+          scene.touchDirection = btn.direction;
+          scene.touchSpeedChange = btn.speedChange;
+          matched = true;
+          break;
+        }
+      }
+  
+      if (!matched) {
+        scene.touchDirection = 0;
+        scene.touchSpeedChange = 0;
+      }
     });
   
-    createButton(xLeft, yDown, '↓', () => {
-      scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1);
-    });
-  
-    const yControls = yDown;
-    const xRight = screenW - margin - size / 2;
-    const xLeftControl = xRight - size - margin;
-  
-    createButton(xLeftControl, yControls, 'L',
-      () => { scene.touchLeft = true; },
-      () => { scene.touchLeft = false; });
-  
-    createButton(xRight, yControls, 'R',
-      () => { scene.touchRight = true; },
-      () => { scene.touchRight = false; });
-  
+    // 🧤 When finger lifted
     scene.input.on('pointerup', () => {
-      scene.touchLeft = false;
-      scene.touchRight = false;
+      scene.touchDirection = 0;
+      scene.touchSpeedChange = 0;
     });
   }
