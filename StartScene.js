@@ -35,26 +35,26 @@ export default class StartScene extends Phaser.Scene {
       callback: () => {
         const def = Phaser.Math.RND.pick(objectConfigs.filter(o => o.type === 'obstacle' || o.type === 'collectible'));
         const conf = def.config();
-        const x = Phaser.Math.Between(50, config.width - 50);
-        const obj = this.add.sprite(x, config.height + 50, def.sprite).setScale(conf.scale);
+        const x = Phaser.Math.Between(50, this.scale.width - 50);
+        const obj = this.add.sprite(x, this.scale.height + 50, def.sprite).setScale(conf.scale);
         this.objects.add(obj);
       }
     });
 
-    this.titleText = this.add.text(config.width / 2, 200, 'Ski Patrol!', {
+    this.titleText = this.add.text(this.scale.width / 2, 200, 'Ski Patrol!', {
       fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
-    this.bigSkier = this.add.sprite(config.width / 2, 300, 'skier_left')
+    this.bigSkier = this.add.sprite(this.scale.width / 2, 300, 'skier_left')
       .setOrigin(0.5)
-      .setDisplaySize(config.height * 0.3 * 0.75, config.height * 0.3)
+      .setDisplaySize(this.scale.height * 0.3 * 0.75, this.scale.height * 0.3)
       .setDepth(1000);
 
-    this.startText = this.add.text(config.width / 2, 500, 'Press SPACE to play', {
+    this.startText = this.add.text(this.scale.width / 2, 500, 'Press SPACE to play', {
       fontSize: '16px', fill: '#020202', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
-    this.difficultyText = this.add.text(config.width / 2, 560, 'Difficulty: Normal', {
+    this.difficultyText = this.add.text(this.scale.width / 2, 560, 'Difficulty: Normal', {
       fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
@@ -94,7 +94,7 @@ export default class StartScene extends Phaser.Scene {
       if (obj.y < -50) obj.destroy();
     });
   }
-  
+
   startMusic() {
     if (this.sound.get('music_game')) this.sound.get('music_game').stop();
   
@@ -108,5 +108,3 @@ export default class StartScene extends Phaser.Scene {
     }
   }
 }
-
-export { StartScene };

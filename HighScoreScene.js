@@ -1,7 +1,7 @@
 // HighScoreScene.js
 import { config } from './game.js';
 
-class HighScoreScene extends Phaser.Scene {
+export default class HighScoreScene extends Phaser.Scene {
     constructor() {
       super({ key: 'HighScoreScene' });
     }
@@ -158,4 +158,3 @@ class HighScoreScene extends Phaser.Scene {
     }
   }
   
-  export { HighScoreScene };

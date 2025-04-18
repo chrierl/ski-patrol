@@ -3,16 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <title>Ski Patrol</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <!-- Style -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Load Phaser and WebFont -->
+  <!-- Phaser library -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
+
+  <!-- WebFont loader (traditional script tag!) -->
   <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 
-  <!-- Start the game after font is loaded -->
+  <!-- Start game after font is loaded -->
   <script type="module">
-    import { config } from './game.js?v=1.1';
+    import { config } from './game.js';
 
     WebFont.load({
       google: {
@@ -24,5 +30,7 @@
     });
   </script>
 </head>
-<body></body>
+
+<body>
+</body>
 </html>
