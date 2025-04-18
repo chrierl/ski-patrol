@@ -1,6 +1,5 @@
 // StartScene.js
 import { objectConfigs, weightedPick } from './objectConfigs.js';
-import { config } from './game.js';
 
 export default class StartScene extends Phaser.Scene {
   constructor() {
@@ -23,7 +22,7 @@ export default class StartScene extends Phaser.Scene {
   }
 
   create() {
-
+    console.log('✅ StartScene launched');
     this.objects = this.add.group();
     this.scrollSpeed = 2;
     this.difficultyOptions = ['Easy', 'Normal', 'Hard', 'Insane'];

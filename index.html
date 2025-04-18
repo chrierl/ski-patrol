@@ -1,36 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
   <title>Ski Patrol</title>
-
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-
-  <!-- Style -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 
   <!-- Phaser library -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
+</head>
+<body>
 
-  <!-- WebFont loader (traditional script tag!) -->
-  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
-
-  <!-- Start game after font is loaded -->
+  <!-- Load font + start game -->
   <script type="module">
-    import { config } from './game.js?v=1.1';
+    import { config } from './game.js?v=1';
 
     WebFont.load({
-      google: {
-        families: ['Press Start 2P']
-      },
-      active: function () {
+      google: { families: ['Press Start 2P'] },
+      active: () => {
         new Phaser.Game(config);
       }
     });
   </script>
-</head>
 
-<body>
+  <!-- WebFont loader -->
+  <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 </body>
 </html>

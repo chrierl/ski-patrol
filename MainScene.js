@@ -1,6 +1,5 @@
 // MainScene.js
 import { objectConfigs, weightedPick } from './objectConfigs.js';
-import { config } from './game.js';
 import { addTouchControls } from './TouchControls.js';
 
 function textStyle() {
