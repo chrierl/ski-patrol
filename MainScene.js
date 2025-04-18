@@ -1,6 +1,7 @@
 // MainScene.js
 import { objectConfigs, weightedPick } from './objectConfigs.js';
 import { config } from './game.js';
+import { addTouchControls } from './TouchControls.js';
 
 function textStyle() {
     return {
@@ -88,50 +89,49 @@ export default class MainScene extends Phaser.Scene {
           .setInteractive()
           .on('pointerdown', () => this.touchRight = true)
           .on('pointerup', () => this.touchRight = false);
-      }
+
+          addTouchControls(this);
+    }
 }
 
-  update(time, delta) {
-    console.log('✅ UPDATE RUNNING', time, delta);
-    
+update(time, delta) {
     if (this.gameOver) return;
+  
     this.lateralSpeed = 0;
-
+  
     if (!this.gamePaused) {
-      if (this.cursors.left.isDown) {
+      const left = this.cursors.left.isDown || this.inputFlags?.left;
+      const right = this.cursors.right.isDown || this.inputFlags?.right;
+  
+      if (left) {
         this.player.setTexture('skier_left');
         this.lateralSpeed = 1.5;
-      } else if (this.cursors.right.isDown) {
+      } else if (right) {
         this.player.setTexture('skier_right');
         this.lateralSpeed = -1.5;
       } else {
         this.player.setTexture('skier');
       }
-
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+  
+      if (Phaser.Input.Keyboard.JustDown(this.cursors.up) || this.inputFlags?.speedUp) {
         this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 1);
       }
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+  
+      if (Phaser.Input.Keyboard.JustDown(this.cursors.down) || this.inputFlags?.slowDown) {
         this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 1);
       }
     }
-    if (!this.gamePaused) {
-        if (this.cursors.left.isDown || this.touchLeft) {
-          this.player.setTexture('skier_left');
-          this.lateralSpeed = 1.5;
-        } else if (this.cursors.right.isDown || this.touchRight) {
-          this.player.setTexture('skier_right');
-          this.lateralSpeed = -1.5;
-        }
-      }
-
+  
     this.moveObjects();
     this.updateDistance();
     this.updateTime(delta);
     this.checkForCollisions();
-
-    if (this.stars.visible) this.stars.rotation += 0.1;
+  
+    if (this.stars.visible) {
+      this.stars.rotation += 0.1;
+    }
   }
+  
 
   moveObjects() {
     [...this.obstacles.getChildren(), ...this.collectibles.getChildren()].forEach(obj => {
