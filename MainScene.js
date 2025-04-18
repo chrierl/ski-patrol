@@ -79,16 +79,6 @@ export default class MainScene extends Phaser.Scene {
     this.distanceText = this.add.text(20, 140, 'Distance: 0', this.textStyle()).setDepth(1000);
   
     if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
-        this.leftBtn = this.add.text(50, this.scale.height - 100, '<', textStyle())
-          .setInteractive()
-          .on('pointerdown', () => this.touchLeft = true)
-          .on('pointerup', () => this.touchLeft = false);
-      
-        this.rightBtn = this.add.text(130, this.scale.height - 100, '>', textStyle())
-          .setInteractive()
-          .on('pointerdown', () => this.touchRight = true)
-          .on('pointerup', () => this.touchRight = false);
-
           addTouchControls(this);
     }
 }
