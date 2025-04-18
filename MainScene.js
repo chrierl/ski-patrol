@@ -29,6 +29,9 @@ export default class MainScene extends Phaser.Scene {
     this.elapsedTimeMs = 0;
     this.remainingTimeMs = 30 * 1000;
     this.spawnAccumulator = 0;
+    this.spawnPadding = 10;
+    const referenceWidth = 680; // original width
+    const widthScaleFactor = this.scale.width / referenceWidth;
 
     const difficultyMap = {
       Easy:    { obstacle: 0.05, collectible: 0.05 },
@@ -41,6 +44,8 @@ export default class MainScene extends Phaser.Scene {
     const settings = difficultyMap[difficulty];
     this.obstacleSpawnChance = settings.obstacle;
     this.collectibleSpawnChance = settings.collectible;
+    this.adjustedObstacleChance = this.obstacleSpawnChance * widthScaleFactor;
+    this.adjustedCollectibleChance = this.collectibleSpawnChance * widthScaleFactor;
 
     this.pickupSound = this.sound.add('pickup');
     this.sound.get('music_start')?.stop();
@@ -114,20 +119,24 @@ export default class MainScene extends Phaser.Scene {
   }
 
   spawnObjectsContinuously() {
-    const obstacles = objectConfigs.filter(o => o.type === 'obstacle');
-    const collectibles = objectConfigs.filter(o => o.type === 'collectible');
+    const obstacleDefs = objectConfigs.filter(o => o.type === 'obstacle');
+    const collectibleDefs = objectConfigs.filter(o => o.type === 'collectible');
+  
     const spawnInterval = 5;
-
     while (this.spawnAccumulator >= spawnInterval) {
       this.spawnAccumulator -= spawnInterval;
-      if (Phaser.Math.FloatBetween(0, 1) < this.obstacleSpawnChance) {
-        const conf = Phaser.Math.RND.pick(obstacles).config();
-        conf.height = Phaser.Math.Between(config.height + 50, config.height + 150);
+  
+      if (Phaser.Math.FloatBetween(0, 1) < this.adjustedObstacleChance) {
+        const def = weightedPick(obstacleDefs);
+        const conf = def.config();
+        conf.height = Phaser.Math.Between(this.scale.height + 50, this.scale.height + 150);
         this.createObstacle(conf);
       }
-      if (Phaser.Math.FloatBetween(0, 1) < this.collectibleSpawnChance) {
-        const conf = Phaser.Math.RND.pick(collectibles).config();
-        conf.height = Phaser.Math.Between(config.height + 50, config.height + 150);
+  
+      if (Phaser.Math.FloatBetween(0, 1) < this.adjustedCollectibleChance) {
+        const def = weightedPick(collectibleDefs);
+        const conf = def.config();
+        conf.height = Phaser.Math.Between(this.scale.height + 50, this.scale.height + 150);
         this.createCollectible(conf);
       }
     }
@@ -267,17 +276,23 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createObstacle(config) {
-    const x = Phaser.Math.Between(50, config.width || config.widthRange?.[1] || 630);
-    const sprite = this.add.sprite(x, config.height, config.sprite);
+    const x = Phaser.Math.Between(this.spawnPadding, this.scale.width - this.spawnPadding);
+    const y = this.scale.height + Phaser.Math.Between(50, 150);
+    const sprite = this.add.sprite(x, y, config.sprite);
     sprite.setScale(config.scale);
+    if (config.rotation) {
+        const angleDeg = Phaser.Math.Between(-config.rotation, config.rotation);
+        sprite.setAngle(angleDeg);
+      }
     sprite.customHitbox = config.hitbox;
     sprite.setDepth(400);
     this.obstacles.add(sprite);
   }
 
   createCollectible(config) {
-    const x = Phaser.Math.Between(50, config.width || config.widthRange?.[1] || 630);
-    const sprite = this.add.sprite(x, config.height, config.sprite);
+    const x = Phaser.Math.Between(this.spawnPadding, this.scale.width - this.spawnPadding);
+    const y = this.scale.height + Phaser.Math.Between(50, 150);
+    const sprite = this.add.sprite(x, y, config.sprite);
     sprite.setScale(config.scale);
     if (config.rotation) {
       const angleDeg = Phaser.Math.Between(-config.rotation, config.rotation);

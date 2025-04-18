@@ -5,8 +5,8 @@ import { HighScoreScene } from './HighScoreScene.js';
 export const config = {
   type: Phaser.AUTO,
   backgroundColor: '#FFF5EE',
-  width: 680,
-  height: 800,
+  width: window.innerWidth,
+  height: window.innerHeight,
   physics: {
     default: 'arcade',
     arcade: { gravity: { y: 200 }, debug: false }

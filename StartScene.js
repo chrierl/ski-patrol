@@ -23,6 +23,7 @@ export default class StartScene extends Phaser.Scene {
   }
 
   create() {
+    
     if (this.sound.get('music_game')) this.sound.get('music_game').stop();
     if (this.sound.get('music_start')) this.sound.get('music_start').stop();
     if (!this.sound.get('music_start')) {
@@ -91,6 +92,7 @@ export default class StartScene extends Phaser.Scene {
       if (obj.y < -50) obj.destroy();
     });
   }
+
 }
 
 export { StartScene };

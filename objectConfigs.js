@@ -131,13 +131,15 @@ export const objectConfigs = [
     }
   ];
   
-export function weightedPick(items) {
-    const weighted = [];
-    items.forEach(item => {
-      for (let i = 0; i < (item.weight || 1); i++) {
-        weighted.push(item);
+  export function weightedPick(items) {
+    const totalWeight = items.reduce((sum, item) => sum + (item.weight || 1), 0);
+    let roll = Phaser.Math.FloatBetween(0, totalWeight);
+    for (const item of items) {
+      roll -= item.weight || 1;
+      if (roll <= 0) {
+        return item;
       }
-    });
-    return Phaser.Math.RND.pick(weighted);
-}
+    }
+    return items[items.length - 1];
+  }
 
