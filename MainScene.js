@@ -100,26 +100,24 @@ update(time, delta) {
     this.lateralSpeed = 0;
   
     if (!this.gamePaused) {
-      const left = this.cursors.left.isDown || this.inputFlags?.left;
-      const right = this.cursors.right.isDown || this.inputFlags?.right;
-  
-      if (left) {
-        this.player.setTexture('skier_left');
-        this.lateralSpeed = 1.5;
-      } else if (right) {
-        this.player.setTexture('skier_right');
-        this.lateralSpeed = -1.5;
-      } else {
-        this.player.setTexture('skier');
-      }
-  
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.up) || this.inputFlags?.speedUp) {
-        this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 1);
-      }
-  
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.down) || this.inputFlags?.slowDown) {
-        this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 1);
-      }
+        // Left/right control (keyboard OR touch)
+        if (this.cursors.left.isDown || this.touchLeft) {
+          this.player.setTexture('skier_left');
+          this.lateralSpeed = 1.5;
+        } else if (this.cursors.right.isDown || this.touchRight) {
+          this.player.setTexture('skier_right');
+          this.lateralSpeed = -1.5;
+        } else {
+          this.player.setTexture('skier');
+        }
+      
+        // Up/down speed control (keyboard only)
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+          this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 1);
+        }
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+          this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 1);
+        }
     }
   
     this.moveObjects();

@@ -1,35 +1,63 @@
-// TouchControls.js
-
 export function addTouchControls(scene) {
-    const btnSize = scene.scale.height * 0.30;
-    const padding = 20;
+    const screenW = scene.scale.width;
+    const screenH = scene.scale.height;
   
-    const makeButton = (label, x, y, flag) => {
-      const bg = scene.add.rectangle(x, y, btnSize, btnSize, 0x000000, 0.3)
-        .setOrigin(0.5)
-        .setInteractive()
-        .setScrollFactor(0)
-        .setDepth(2000);
+    const sizeW = screenW * 0.15;
+    const sizeH = screenH * 0.15;
+    const size = Math.min(sizeW, sizeH);
+    const margin = 20;
   
-      const text = scene.add.text(x, y, label, {
-        fontSize: `${btnSize * 0.4}px`,
-        color: '#ffffff',
-        fontFamily: 'Press Start 2P'
-      }).setOrigin(0.5).setDepth(2001);
-  
-      bg.on('pointerdown', () => scene.inputFlags[flag] = true);
-      bg.on('pointerup', () => scene.inputFlags[flag] = false);
-      bg.on('pointerout', () => scene.inputFlags[flag] = false);
+    const style = {
+      fontSize: `${size * 0.5}px`,
+      fill: '#ffffff',
+      fontFamily: '"Press Start 2P"',
+      align: 'center'
     };
   
-    scene.inputFlags = {};
+    scene.touchLeft = false;
+    scene.touchRight = false;
   
-    const w = scene.scale.width;
-    const h = scene.scale.height;
+    const createButton = (x, y, label, onDown, onUp = () => {}) => {
+      const bg = scene.add.rectangle(x, y, size, size, 0x000000, 0.4)
+        .setOrigin(0.5)
+        .setStrokeStyle(2, 0xffffff)
+        .setDepth(1000);
+      const text = scene.add.text(x, y, label, style)
+        .setOrigin(0.5)
+        .setDepth(1001);
   
-    makeButton('⏫', padding + btnSize / 2, h - btnSize * 2.2, 'speedUp');
-    makeButton('⏬', padding + btnSize / 2, h - btnSize, 'slowDown');
-    makeButton('⬅️', w - padding - btnSize * 1.5, h - btnSize * 1.6, 'left');
-    makeButton('➡️', w - padding - btnSize * 0.5, h - btnSize * 1.6, 'right');
+      bg.setInteractive({ useHandCursor: true });
+      bg.on('pointerdown', onDown);
+      bg.on('pointerup', onUp);
+  
+      return { bg, text };
+    };
+  
+    const xLeft = margin + size / 2;
+    const yDown = screenH - margin - size / 2;
+  
+    createButton(xLeft, yDown - size - margin, '↑', () => {
+      scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1);
+    });
+  
+    createButton(xLeft, yDown, '↓', () => {
+      scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1);
+    });
+  
+    const yControls = yDown;
+    const xRight = screenW - margin - size / 2;
+    const xLeftControl = xRight - size - margin;
+  
+    createButton(xLeftControl, yControls, '<',
+      () => { scene.touchLeft = true; },
+      () => { scene.touchLeft = false; });
+  
+    createButton(xRight, yControls, '>',
+      () => { scene.touchRight = true; },
+      () => { scene.touchRight = false; });
+  
+    scene.input.on('pointerup', () => {
+      scene.touchLeft = false;
+      scene.touchRight = false;
+    });
   }
-  
