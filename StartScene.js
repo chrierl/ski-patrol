@@ -23,14 +23,6 @@ export default class StartScene extends Phaser.Scene {
   }
 
   create() {
-    
-    if (this.sound.get('music_game')) {
-        this.sound.get('music_game').stop();
-      }
-    if (!this.sound.get('music_start')) {
-        this.sound.add('music_start', { loop: true, volume: 0.5 });
-    }
-    this.sound.get('music_start').play();
 
     this.objects = this.add.group();
     this.scrollSpeed = 2;
@@ -66,6 +58,10 @@ export default class StartScene extends Phaser.Scene {
       fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
+    // Förhindra att musiken startar automatiskt innan interaktion
+    this.input.once('pointerdown', () => this.startMusic());
+    this.input.keyboard.once('keydown', () => this.startMusic());
+
     this.input.keyboard.once('keydown-SPACE', () => {
       const selected = this.difficultyOptions[this.difficultyIndex];
       this.scene.start('MainScene', { difficulty: selected });
@@ -98,7 +94,19 @@ export default class StartScene extends Phaser.Scene {
       if (obj.y < -50) obj.destroy();
     });
   }
-
+  
+  startMusic() {
+    if (this.sound.get('music_game')) this.sound.get('music_game').stop();
+  
+    let music = this.sound.get('music_start');
+    if (!music) {
+      music = this.sound.add('music_start', { loop: true, volume: 0.5 });
+    }
+  
+    if (!music.isPlaying) {
+      music.play();
+    }
+  }
 }
 
 export { StartScene };
