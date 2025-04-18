@@ -67,7 +67,19 @@ export default class MainScene extends Phaser.Scene {
     this.timeText = this.add.text(20, 100, 'Time: 60.0s', this.textStyle()).setDepth(1000);
     this.scoreText = this.add.text(20, 120, 'Pickups: 0', this.textStyle()).setDepth(1000);
     this.distanceText = this.add.text(20, 140, 'Distance: 0', this.textStyle()).setDepth(1000);
-  }
+  
+    if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+        this.leftBtn = this.add.text(50, this.scale.height - 100, '<', textStyle())
+          .setInteractive()
+          .on('pointerdown', () => this.touchLeft = true)
+          .on('pointerup', () => this.touchLeft = false);
+      
+        this.rightBtn = this.add.text(130, this.scale.height - 100, '>', textStyle())
+          .setInteractive()
+          .on('pointerdown', () => this.touchRight = true)
+          .on('pointerup', () => this.touchRight = false);
+      }
+}
 
   update(time, delta) {
     if (this.gameOver) return;
@@ -91,6 +103,15 @@ export default class MainScene extends Phaser.Scene {
         this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 1);
       }
     }
+    if (!this.gamePaused) {
+        if (this.cursors.left.isDown || this.touchLeft) {
+          this.player.setTexture('skier_left');
+          this.lateralSpeed = 1.5;
+        } else if (this.cursors.right.isDown || this.touchRight) {
+          this.player.setTexture('skier_right');
+          this.lateralSpeed = -1.5;
+        }
+      }
 
     this.moveObjects();
     this.updateDistance();

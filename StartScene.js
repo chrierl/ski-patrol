@@ -84,6 +84,11 @@ export default class StartScene extends Phaser.Scene {
       const label = this.difficultyOptions[this.difficultyIndex];
       this.difficultyText.setText('Difficulty: ' + label);
     };
+
+    this.input.on('pointerdown', () => {
+        const selected = this.difficultyOptions[this.difficultyIndex];
+        this.scene.start('MainScene', { difficulty: selected });
+      });
   }
 
   update() {
