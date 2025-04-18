@@ -3,7 +3,7 @@ html, body {
   padding: 0;
   overflow: hidden;
   height: 100%;
-  background: #FFF5EE;
+  background: #e06b18;
 }
 
 canvas {
@@ -11,4 +11,5 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
+  background: #23c147;
 }
