@@ -3,7 +3,7 @@ import StartScene from './StartScene.js';
 import MainScene from './MainScene.js';
 import HighScoreScene from './HighScoreScene.js';
 
-export const config = {
+const config = {
   type: Phaser.AUTO,
   width: window.innerWidth,
   height: window.innerHeight,
@@ -18,3 +18,5 @@ export const config = {
     autoCenter: Phaser.Scale.CENTER_BOTH
   }
 };
+
+export default config;

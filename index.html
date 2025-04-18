@@ -13,13 +13,11 @@
 
   <!-- Load font + start game -->
   <script type="module">
-    import { config } from './game.js?v=1';
-
+    import config from './game.js';
+  
     WebFont.load({
       google: { families: ['Press Start 2P'] },
-      active: () => {
-        new Phaser.Game(config);
-      }
+      active: () => new Phaser.Game(config)
     });
   </script>
 
