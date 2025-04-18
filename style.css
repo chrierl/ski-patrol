@@ -2,8 +2,8 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background: #FFF5EE;
   height: 100%;
-  background: #FFF5EE; /* Samma färg som spelet */
 }
 
 canvas {
@@ -12,6 +12,6 @@ canvas {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
-  background-color: #FFF5EE; /* Samma som spelet */
+  height: calc(var(--vh, 1vh) * 100);
+  background-color: #FFF5EE;
 }

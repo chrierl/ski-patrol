@@ -2,50 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Ski Patrol</title>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
-  <!-- Style -->
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100%;
-      background: #FFF5EE;
-    }
-
-    canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #FFF5EE;
-    }
-  </style>
-</head>
-
-<body>
+  <!-- Phaser and WebFont -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
 
+  <!-- Fix for mobile viewport height -->
+  <script>
+    function updateViewportHeight() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    window.addEventListener('resize', updateViewportHeight);
+    window.addEventListener('orientationchange', updateViewportHeight);
+    window.addEventListener('load', updateViewportHeight);
+    updateViewportHeight();
+  </script>
+</head>
+
+<body>
+  <!-- Start the game after font is loaded -->
   <script type="module">
-    import config from './game.js?v=1.3';
-    import { resizeCanvas } from './resizeCanvas.js';
+    import config from './game.js';
 
     WebFont.load({
-      google: { families: ['Press Start 2P'] },
-      active: () => {
-        resizeCanvas();
+      google: {
+        families: ['Press Start 2P']
+      },
+      active: function () {
         new Phaser.Game(config);
       }
     });
-
-    window.addEventListener('resize', resizeCanvas);
   </script>
 </body>
 </html>
