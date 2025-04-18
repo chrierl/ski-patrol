@@ -34,7 +34,7 @@ export default class HighScoreScene extends Phaser.Scene {
       let yStart = 50;
 
       this.highscoreTexts.push(
-        this.add.text(config.width / 2, yStart, 'HIGH SCORES', {
+        this.add.text(this.scale.width / 2, yStart, 'HIGH SCORES', {
           fontSize: '24px', fill: '#E34234', fontFamily: '"Press Start 2P"'
         }).setOrigin(0.5)
       );
@@ -79,7 +79,7 @@ export default class HighScoreScene extends Phaser.Scene {
   
       if (this.placedIn.length > 0) {
         this.inputText = '';
-        this.nameText = this.add.text(config.width / 2, config.height - 40, 'ENTER NAME: ', {
+        this.nameText = this.add.text(this.scale.width / 2, this.scale.height - 40, 'ENTER NAME: ', {
           fontSize: '14px', fill: '#020202', fontFamily: '"Press Start 2P"'
         }).setOrigin(0.5);
         this.highscoreTexts.push(this.nameText);
@@ -105,7 +105,7 @@ export default class HighScoreScene extends Phaser.Scene {
         this.nameText.setVisible(false);
       }
   
-      this.add.text(config.width / 2, config.height - 40, 'PRESS SPACE TO RETURN', {
+      this.add.text(this.scale.width / 2, this.scale.height - 40, 'PRESS SPACE TO RETURN', {
         fontSize: '14px', fill: '#020202', fontFamily: '"Press Start 2P"'
       }).setOrigin(0.5);
   
