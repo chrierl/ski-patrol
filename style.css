@@ -1,10 +1,14 @@
-body {
+html, body {
   margin: 0;
+  padding: 0;
   overflow: hidden;
+  height: 100%;
+  background: #FFF5EE;
 }
 
 canvas {
   display: block;
-  width: 100vw;
-  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
