@@ -1,7 +1,7 @@
 // TouchControls.js
 
 export function addTouchControls(scene) {
-    const btnSize = scene.scale.height * 0.15; // 15% of height
+    const btnSize = scene.scale.height * 0.30;
     const padding = 20;
   
     const makeButton = (label, x, y, flag) => {
