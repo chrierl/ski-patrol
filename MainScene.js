@@ -291,12 +291,31 @@ update(time, delta) {
         fontSize: '24px', fill: '#020202', fontFamily: '"Press Start 2P"', align: 'center'
     }).setOrigin(0.5).setDepth(1001);
 
-    this.input.keyboard.once('keydown-SPACE', () => {
-      this.scene.start('HighScoreScene', {
+    // Add on-screen "tap to continue" for mobile
+    const overlay = this.add.rectangle(
+        this.scale.width / 2,
+        this.scale.height / 2,
+        this.scale.width,
+        this.scale.height,
+        0x000000,
+        0 // transparent but interactive
+    ).setOrigin(0.5).setInteractive().setDepth(10000);
+    
+    overlay.once('pointerdown', () => {
+        this.scene.start('HighScoreScene', {
         distance: this.distance,
         elapsedTimeMs: this.elapsedTimeMs,
         score: this.score
-      });
+        });
+    });
+    
+    // Still allow space key on desktop
+    this.input.keyboard.once('keydown-SPACE', () => {
+        this.scene.start('HighScoreScene', {
+        distance: this.distance,
+        elapsedTimeMs: this.elapsedTimeMs,
+        score: this.score
+        });
     });
 
     this.sound.get('music_game')?.stop();
