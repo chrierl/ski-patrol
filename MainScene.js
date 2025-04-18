@@ -2,6 +2,14 @@
 import { objectConfigs, weightedPick } from './objectConfigs.js';
 import { config } from './game.js';
 
+function textStyle() {
+    return {
+      fontSize: '12px',
+      fill: '#020202',
+      fontFamily: '"Press Start 2P"'
+    };
+  }
+
 export default class MainScene extends Phaser.Scene {
   constructor() {
     super({ key: 'MainScene' });
@@ -84,7 +92,9 @@ export default class MainScene extends Phaser.Scene {
 }
 
   update(time, delta) {
-    //if (this.gameOver) return;
+    console.log('✅ UPDATE RUNNING', time, delta);
+    
+    if (this.gameOver) return;
     this.lateralSpeed = 0;
 
     if (!this.gamePaused) {
