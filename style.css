@@ -3,7 +3,7 @@ html, body {
   padding: 0;
   overflow: hidden;
   height: 100%;
-  background: #e06b18;
+  background: #FFF5EE; /* Samma färg som spelet */
 }
 
 canvas {
@@ -11,5 +11,7 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-  background: #23c147;
+  width: 100vw;
+  height: 100vh;
+  background-color: #FFF5EE; /* Samma som spelet */
 }
