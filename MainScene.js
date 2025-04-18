@@ -82,7 +82,7 @@ export default class MainScene extends Phaser.Scene {
 }
 
   update(time, delta) {
-    if (this.gameOver) return;
+    //if (this.gameOver) return;
     this.lateralSpeed = 0;
 
     if (!this.gamePaused) {
