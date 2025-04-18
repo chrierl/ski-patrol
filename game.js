@@ -152,6 +152,7 @@ class StartScene extends Phaser.Scene {
     this.load.image('tree', 'assets/tree.png');
     this.load.image('rock', 'assets/rock.png');
     this.load.image('snowman', 'assets/snowman.png');
+    this.load.image('groomer', 'assets/groomer.png');
     this.load.image('simon', 'assets/simon.png'); 
     this.load.image('can', 'assets/can.png');
     this.load.image('bottle', 'assets/bottle.png');
