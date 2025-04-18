@@ -1,79 +1,35 @@
 // TouchControls.js
+
 export function addTouchControls(scene) {
-    const width = scene.scale.width;
-    const height = scene.scale.height;
-  
-    const buttonSize = 64;
+    const btnSize = scene.scale.height * 0.15; // 15% of height
     const padding = 20;
   
-    // === FART ===
-    const upButton = scene.add.rectangle(
-      padding + buttonSize / 2,
-      height - padding - buttonSize * 1.5,
-      buttonSize,
-      buttonSize,
-      0xE34234
-    ).setScrollFactor(0).setInteractive();
-    const downButton = scene.add.rectangle(
-      padding + buttonSize / 2,
-      height - padding - buttonSize / 2,
-      buttonSize,
-      buttonSize,
-      0xE34234
-    ).setScrollFactor(0).setInteractive();
+    const makeButton = (label, x, y, flag) => {
+      const bg = scene.add.rectangle(x, y, btnSize, btnSize, 0x000000, 0.3)
+        .setOrigin(0.5)
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDepth(2000);
   
-    const upText = scene.add.text(upButton.x, upButton.y, '⏫', {
-      fontSize: '32px', color: '#ffffff', fontFamily: 'Arial'
-    }).setOrigin(0.5);
-    const downText = scene.add.text(downButton.x, downButton.y, '⏬', {
-      fontSize: '32px', color: '#ffffff', fontFamily: 'Arial'
-    }).setOrigin(0.5);
+      const text = scene.add.text(x, y, label, {
+        fontSize: `${btnSize * 0.4}px`,
+        color: '#ffffff',
+        fontFamily: 'Press Start 2P'
+      }).setOrigin(0.5).setDepth(2001);
   
-    upButton.on('pointerdown', () => {
-      scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1);
-    });
-    downButton.on('pointerdown', () => {
-      scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1);
-    });
+      bg.on('pointerdown', () => scene.inputFlags[flag] = true);
+      bg.on('pointerup', () => scene.inputFlags[flag] = false);
+      bg.on('pointerout', () => scene.inputFlags[flag] = false);
+    };
   
-    // === STYRNING ===
-    const rightButton = scene.add.rectangle(
-      width - padding - buttonSize / 2,
-      height - padding - buttonSize / 2,
-      buttonSize,
-      buttonSize,
-      0xE34234
-    ).setScrollFactor(0).setInteractive();
-    const leftButton = scene.add.rectangle(
-      width - padding - buttonSize * 1.5,
-      height - padding - buttonSize / 2,
-      buttonSize,
-      buttonSize,
-      0xE34234
-    ).setScrollFactor(0).setInteractive();
+    scene.inputFlags = {};
   
-    const rightText = scene.add.text(rightButton.x, rightButton.y, '➡️', {
-      fontSize: '32px', color: '#ffffff', fontFamily: 'Arial'
-    }).setOrigin(0.5);
-    const leftText = scene.add.text(leftButton.x, leftButton.y, '⬅️', {
-      fontSize: '32px', color: '#ffffff', fontFamily: 'Arial'
-    }).setOrigin(0.5);
+    const w = scene.scale.width;
+    const h = scene.scale.height;
   
-    rightButton.on('pointerdown', () => {
-      scene.inputFlags.right = true;
-    });
-    leftButton.on('pointerdown', () => {
-      scene.inputFlags.left = true;
-    });
-  
-    rightButton.on('pointerup', () => {
-      scene.inputFlags.right = false;
-    });
-    leftButton.on('pointerup', () => {
-      scene.inputFlags.left = false;
-    });
-  
-    // Gör även detta för touch utanför knapparna
-    scene.inputFlags = { left: false, right: false };
+    makeButton('⏫', padding + btnSize / 2, h - btnSize * 2.2, 'speedUp');
+    makeButton('⏬', padding + btnSize / 2, h - btnSize, 'slowDown');
+    makeButton('⬅️', w - padding - btnSize * 1.5, h - btnSize * 1.6, 'left');
+    makeButton('➡️', w - padding - btnSize * 0.5, h - btnSize * 1.6, 'right');
   }
   
