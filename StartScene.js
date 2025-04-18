@@ -24,10 +24,11 @@ export default class StartScene extends Phaser.Scene {
 
   create() {
     
-    if (this.sound.get('music_game')) this.sound.get('music_game').stop();
-    if (this.sound.get('music_start')) this.sound.get('music_start').stop();
+    if (this.sound.get('music_game')) {
+        this.sound.get('music_game').stop();
+      }
     if (!this.sound.get('music_start')) {
-      this.sound.add('music_start', { loop: true, volume: 0.5 });
+        this.sound.add('music_start', { loop: true, volume: 0.5 });
     }
     this.sound.get('music_start').play();
 
