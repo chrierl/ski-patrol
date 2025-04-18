@@ -34,7 +34,8 @@ export function addTouchControls(scene) {
     };
   
     const xLeft = margin + size / 2;
-    const yDown = screenH - margin - size / 2;
+    const safeBottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sat')) || 0;
+    const yDown = screenH - margin - size / 2 - safeBottom;
   
     createButton(xLeft, yDown - size - margin, '↑', () => {
       scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1);
