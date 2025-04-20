@@ -1,6 +1,6 @@
 // MainScene.js
 import { objectConfigs, weightedPick } from './objectConfigs.js';
-import { addTouchControls } from './TouchControls.js';
+import { addTouchControlGrid } from './TouchControls.js';
 
 function textStyle() {
     return {
@@ -81,40 +81,54 @@ export default class MainScene extends Phaser.Scene {
     this.distanceText = this.add.text(20, 140, 'Distance: 0', this.textStyle()).setDepth(1000);
   
     if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
-          addTouchControls(this);
+        addTouchControlGrid(this, {
+          columns: [0.3, 0.4, 0.3],
+          rows: [0.3, 0.4, 0.3],
+          controlHeightPercent: 0.4,
+          controlWidthPercent:0.8,
+          verticalOffset: 30,
+          alpha: 0.10
+        });
     }
 }
 
 update(time, delta) {
     if (this.gameOver) return;
-    
-    this.lateralSpeed = 0;
+  
+    // Skip keyboard input if touch input was detected
+    const usingTouch = this.sys.game.device.input.touch;
+  
     if (!this.gamePaused) {
-        // Horizontal
+      if (!usingTouch) {
+        this.lateralSpeed = 0;
+  
         if (this.cursors.left.isDown) {
           this.player.setTexture('skier_left');
           this.lateralSpeed = 1.5;
         } else if (this.cursors.right.isDown) {
           this.player.setTexture('skier_right');
           this.lateralSpeed = -1.5;
-        } else if (this.touchDirection === -1) {
-          this.player.setTexture('skier_left');
-          this.lateralSpeed = 1.5;
-        } else if (this.touchDirection === 1) {
-          this.player.setTexture('skier_right');
-          this.lateralSpeed = -1.5;
         } else {
           this.player.setTexture('skier');
-          this.lateralSpeed = 0;
         }
-      
-        // Vertical (speed)
-        if (this.cursors.up.isDown || this.touchSpeedChange === -1) {
-          this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 0.05);
-        } else if (this.cursors.down.isDown || this.touchSpeedChange === 1) {
-          this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 0.05);
+  
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+          this.scrollSpeedY = Math.max(this.minSpeed, this.scrollSpeedY - 1);
+        }
+        if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
+          this.scrollSpeedY = Math.min(this.maxSpeed, this.scrollSpeedY + 1);
+        }
+      } else {
+        // Touch mode: just switch texture based on current lateralSpeed
+        if (this.lateralSpeed > 0) {
+          this.player.setTexture('skier_left');
+        } else if (this.lateralSpeed < 0) {
+          this.player.setTexture('skier_right');
+        } else {
+          this.player.setTexture('skier');
         }
       }
+    }
   
     this.moveObjects();
     this.updateDistance();

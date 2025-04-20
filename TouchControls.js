@@ -1,82 +1,69 @@
-export function addTouchControls(scene) {
+// TouchControls.js
+
+export function addTouchControlGrid(scene, layoutConfig = {}) {
     const screenW = scene.scale.width;
     const screenH = scene.scale.height;
   
-    const size = Math.min(screenW, screenH) * 0.12;
-    const gap = size * 0.2;
-    const totalWidth = size * 3 + gap * 2;
-    const totalHeight = size * 3 + gap * 2;
+    const areaWidthPercent = layoutConfig.controlWidthPercent || 1.0;
+    const areaHeightPercent = layoutConfig.controlHeightPercent || 1.0;
+    const verticalOffset = layoutConfig.verticalOffset || 0;
+    const transparency = layoutConfig.alpha || 0.05;
   
-    const startX = (screenW - totalWidth) / 2;
-    const startY = screenH - totalHeight - 20;
+    const colPercents = layoutConfig.columns || [0.33, 0.34, 0.33];
+    const rowPercents = layoutConfig.rows || [0.33, 0.34, 0.33];
   
-    const style = {
-      fontSize: `${size * 0.4}px`,
-      fill: '#ffffff',
-      fontFamily: '"Press Start 2P"',
-      align: 'center'
-    };
+    const areaW = screenW * areaWidthPercent;
+    const areaH = screenH * areaHeightPercent;
+    const areaLeft = (screenW - areaW) / 2;
+    const areaTop = screenH - areaH - verticalOffset;
   
-    const buttonAreas = [];
+    const zoneW = colPercents.map(p => areaW * p);
+    const zoneH = rowPercents.map(p => areaH * p);
   
-    const createButton = (col, row, label, direction, speedChange) => {
-      const x = startX + col * (size + gap) + size / 2;
-      const y = startY + row * (size + gap) + size / 2;
+    const labels = [
+      ['↖', '↑', '↗'],
+      ['←', '⏺', '→'],
+      ['↙', '↓', '↘']
+    ];
   
-      scene.add.rectangle(x, y, size, size, 0x000000, 0.4)
-        .setOrigin(0.5)
-        .setStrokeStyle(2, 0xffffff)
-        .setDepth(1000);
-      scene.add.text(x, y, label, style)
-        .setOrigin(0.5)
-        .setDepth(1001);
+    const actions = [
+      () => { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); },
+      () => { scene.lateralSpeed = 0; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); },
+      () => { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); },
+      () => { scene.lateralSpeed = 1.5; },
+      () => { scene.lateralSpeed = 0; }, // Center
+      () => { scene.lateralSpeed = -1.5; },
+      () => { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); },
+      () => { scene.lateralSpeed = 0; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); },
+      () => { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); },
+    ];
   
-      // Save button area for pointer tracking
-      buttonAreas.push({
-        rect: new Phaser.Geom.Rectangle(x - size/2, y - size/2, size, size),
-        direction,
-        speedChange
-      });
-    };
+    let startX = areaLeft;
+    for (let col = 0; col < 3; col++) {
+      let startY = areaTop;
+      for (let row = 0; row < 3; row++) {
+        const width = zoneW[col];
+        const height = zoneH[row];
   
-    // Grid: row (Y), col (X)
-    createButton(0, 0, '↖', -1, -1);
-    createButton(1, 0, '↑',  0, -1);
-    createButton(2, 0, '↗',  1, -1);
+        const bg = scene.add.rectangle(startX + width / 2, startY + height / 2, width, height, 0x000000, transparency)
+          .setOrigin(0.5)
+          .setDepth(1000)
+          .setInteractive({ useHandCursor: false });
   
-    createButton(0, 1, '←', -1,  0);
-    createButton(1, 1, '•',  0,  0);
-    createButton(2, 1, '→',  1,  0);
+        const label = scene.add.text(startX + width / 2, startY + height / 2, labels[row][col], {
+          fontSize: `${Math.floor(height * 0.4)}px`,
+          fill: '#ffffff',
+          fontFamily: '"Press Start 2P"'
+        }).setOrigin(0.5).setAlpha(0.2).setDepth(1001);
   
-    createButton(0, 2, '↙', -1,  1);
-    createButton(1, 2, '↓',  0,  1);
-    createButton(2, 2, '↘',  1,  1);
+        const index = row * 3 + col;
+        bg.on('pointerdown', () => actions[index]());
+        bg.on('pointerover', (pointer) => {
+          if (pointer.isDown) actions[index]();
+        });
   
-    // 🧠 Handle pointer drag movement
-    scene.input.on('pointermove', pointer => {
-      if (!pointer.isDown) return;
-      const x = pointer.x;
-      const y = pointer.y;
-  
-      let matched = false;
-      for (const btn of buttonAreas) {
-        if (Phaser.Geom.Rectangle.Contains(btn.rect, x, y)) {
-          scene.touchDirection = btn.direction;
-          scene.touchSpeedChange = btn.speedChange;
-          matched = true;
-          break;
-        }
+        startY += height;
       }
-  
-      if (!matched) {
-        scene.touchDirection = 0;
-        scene.touchSpeedChange = 0;
-      }
-    });
-  
-    // 🧤 When finger lifted
-    scene.input.on('pointerup', () => {
-      scene.touchDirection = 0;
-      scene.touchSpeedChange = 0;
-    });
+      startX += zoneW[col];
+    }
   }
