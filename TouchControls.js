@@ -27,16 +27,16 @@ export function addTouchControlGrid(scene, layoutConfig = {}) {
     ];
   
     const actions = [
-      () => { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); },
-      () => { scene.lateralSpeed = 0; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); },
-      () => { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); },
-      () => { scene.lateralSpeed = 1.5; },
-      () => { scene.lateralSpeed = 0; }, // Center
-      () => { scene.lateralSpeed = -1.5; },
-      () => { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); },
-      () => { scene.lateralSpeed = 0; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); },
-      () => { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); },
-    ];
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
+        () => { if (!scene.gamePaused) { scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; } },
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = 0; } },
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; } },
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
+        () => { if (!scene.gamePaused) { scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
+        () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
+      ];
   
     let startX = areaLeft;
     for (let col = 0; col < 3; col++) {
@@ -56,12 +56,10 @@ export function addTouchControlGrid(scene, layoutConfig = {}) {
           fontFamily: '"Press Start 2P"'
         }).setOrigin(0.5).setAlpha(0.2).setDepth(1001);
   
-        const index = row * 3 + col;
-        bg.on('pointerdown', () => actions[index]());
-        bg.on('pointerover', (pointer) => {
-          if (pointer.isDown) actions[index]();
-        });
-  
+        const index = row * 3 + col; 
+        bg.on('pointerdown', (pointer) => { if (!scene.gamePaused) actions[index](); });          
+        bg.on('pointerover', (pointer) => { if (pointer.isDown && !scene.gamePaused) actions[index]();  });
+
         startY += height;
       }
       startX += zoneW[col];
