@@ -4,7 +4,7 @@ export const objectConfigs = [
       sprite: 'tree',
       weight: 30,
       scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
-      hitbox: { x: 0.3, y: 0.65, width: 0.4, height: 0.30 },
+      hitbox: { x: 0.3, y: 0.50, width: 0.4, height: 0.35 },
       config() {
         return {
           sprite: this.sprite,

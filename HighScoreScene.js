@@ -80,7 +80,10 @@ export default class HighScoreScene extends Phaser.Scene {
         });
 
         if (this.placedIn.length > 0) {
+            console.log("Record detected. isMobile=", isMobile());
+
             if (isMobile() && !this.hasPromptedForName) {
+                console.log("Mobile record detected.");
                 this.hasPromptedForName = true;
                 setTimeout(() => {
                     const name = prompt('Enter your name (max 12 characters):');
@@ -90,8 +93,8 @@ export default class HighScoreScene extends Phaser.Scene {
                     }
                     this.showContinuePrompt();
                   }, 100); 
-            } else if (!isMobile) {
-            // ✅ Desktop: handle keys via Phaser
+            } else if (!isMobile()) {
+                // ✅ Desktop: handle keys via Phaser
                 console.log("Desktop record detected.");
                 this.inputText = '';
                 this.nameText = this.add.text(this.scale.width / 2, this.scale.height - 40, 'ENTER NAME: ', {
@@ -121,7 +124,7 @@ export default class HighScoreScene extends Phaser.Scene {
         this.nameText.setVisible(false);
       }
   
-      this.add.text(this.scale.width / 2, this.scale.height - 40, 'PRESS SPACE TO RETURN', {
+      this.add.text(this.scale.width / 2, this.scale.height - 20, 'PRESS SPACE TO RETURN', {
         fontSize: '14px', fill: '#020202', fontFamily: '"Press Start 2P"'
       }).setOrigin(0.5);
   

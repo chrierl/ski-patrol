@@ -22,7 +22,6 @@ export default class StartScene extends Phaser.Scene {
   }
 
   create() {
-    console.log('✅ StartScene launched');
     this.objects = this.add.group();
     this.scrollSpeed = 2;
     this.difficultyOptions = ['Easy', 'Normal', 'Hard', 'Insane'];
@@ -36,6 +35,10 @@ export default class StartScene extends Phaser.Scene {
         const conf = def.config();
         const x = Phaser.Math.Between(50, this.scale.width - 50);
         const obj = this.add.sprite(x, this.scale.height + 50, def.sprite).setScale(conf.scale);
+        if (conf.rotation) {
+            const angleDeg = Phaser.Math.Between(-conf.rotation, conf.rotation);
+            obj.setAngle(angleDeg);
+        }
         this.objects.add(obj);
       }
     });
