@@ -56,9 +56,14 @@ export default class StartScene extends Phaser.Scene {
       fontSize: '16px', fill: '#020202', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1000);
 
-    this.difficultyText = this.add.text(this.scale.width / 2, 560, 'Difficulty: Normal', {
+    this.startText = this.add.text(this.scale.width / 2, 560, 'Press ENTER for high scores', {
+        fontSize: '16px', fill: '#020202', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5).setDepth(1000);
+
+    // Skip difficulty
+    /*this.difficultyText = this.add.text(this.scale.width / 2, 560, 'Difficulty: Normal', {
       fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5).setDepth(1000);
+    }).setOrigin(0.5).setDepth(1000); */
 
     // Förhindra att musiken startar automatiskt innan interaktion
     this.input.once('pointerdown', () => this.startMusic());
@@ -69,19 +74,24 @@ export default class StartScene extends Phaser.Scene {
       this.scene.start('MainScene', { difficulty: selected });
     });
 
+    this.input.keyboard.on('keydown-ENTER', () => {
+        const selected = this.difficultyOptions[this.difficultyIndex];
+        this.scene.start('HighScoreScene', { difficulty: selected });
+      });
+
     this.input.keyboard.on('keydown-LEFT', () => {
-      this.difficultyIndex = (this.difficultyIndex + 3) % 4;
-      this.updateDifficultyText();
+      //this.difficultyIndex = (this.difficultyIndex + 3) % 4;
+      //this.updateDifficultyText();
     });
 
     this.input.keyboard.on('keydown-RIGHT', () => {
-      this.difficultyIndex = (this.difficultyIndex + 1) % 4;
-      this.updateDifficultyText();
+      //this.difficultyIndex = (this.difficultyIndex + 1) % 4;
+      //this.updateDifficultyText();
     });
 
     this.updateDifficultyText = () => {
       const label = this.difficultyOptions[this.difficultyIndex];
-      this.difficultyText.setText('Difficulty: ' + label);
+      //this.difficultyText.setText('Difficulty: ' + label);
     };
 
     this.input.on('pointerdown', () => {

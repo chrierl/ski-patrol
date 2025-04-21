@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">  <title>Ski Patrol</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
@@ -35,6 +36,25 @@
         new Phaser.Game(config);
       }
     });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6FN38SHcDWRCk8UYAkZT6nV5tFQuoLac",
+      authDomain: "ski-patrol-62b94.firebaseapp.com",
+      projectId: "ski-patrol-62b94",
+      storageBucket: "ski-patrol-62b94.firebasestorage.app",
+      messagingSenderId: "677092678107",
+      appId: "1:677092678107:web:2c878b8395f27411e8affe"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.firebase = { db, collection, addDoc, getDocs, query, orderBy, limit };
   </script>
 </head>
 
