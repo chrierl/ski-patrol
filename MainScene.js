@@ -1,6 +1,8 @@
 // MainScene.js
 import { objectConfigs, weightedPick } from './objectConfigs.js';
 import { addTouchControlGrid } from './TouchControls.js';
+import { highScoreManager } from './game.js';
+import { isMobile } from './helpers.js';
 
 function textStyle() {
     return {
@@ -287,47 +289,97 @@ update(time, delta) {
     }, 5000);
   }
 
-  endGame() {
+  async endGame() {
     this.gameOver = true;
     this.scrollSpeedY = 0;
     this.lateralSpeed = 0;
-
-    this.add.text(this.scale.width / 2, this.scale.height / 2, 'GAME OVER', {
-      fontSize: '48px', fill: '#E34234', fontFamily: '"Press Start 2P"'
+  
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+  
+    this.add.text(centerX, centerY - 60, 'GAME OVER', {
+      fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1001);
-
-    this.add.text(this.scale.width / 2, this.scale.height / 2 + 60,
-      `Distance: ${Math.round(this.distance / 20)} m\nCollected: ${this.score}`, {
-        fontSize: '24px', fill: '#020202', fontFamily: '"Press Start 2P"', align: 'center'
-    }).setOrigin(0.5).setDepth(1001);
-
-    // Add on-screen "tap to continue" for mobile
-    const overlay = this.add.rectangle(
-        this.scale.width / 2,
-        this.scale.height / 2,
-        this.scale.width,
-        this.scale.height,
-        0x000000,
-        0 // transparent but interactive
-    ).setOrigin(0.5).setInteractive().setDepth(10000);
-    
-    overlay.once('pointerdown', () => {
-        this.scene.start('HighScoreScene', {
-        distance: this.distance,
-        elapsedTimeMs: this.elapsedTimeMs,
-        score: this.score
+  
+    const categories = [
+      { key: 'distance', value: Math.round(this.distance / 20) },
+      { key: 'time', value: parseFloat((this.elapsedTimeMs / 1000).toFixed(1)) },
+      { key: 'items', value: this.score }
+    ];
+  
+    // Kolla om något rekord slagits
+    let localRecord = false;
+    let globalRecord = false;
+    const newScores = [];
+  
+    for (const cat of categories) {
+      if (highScoreManager.isLocalRecord(cat.key, cat.value)) {
+        localRecord = true;
+        newScores.push({ category: cat.key, value: cat.value });
+      } else if (await highScoreManager.isGlobalRecord(cat.key, cat.value)) {
+        globalRecord = true;
+        newScores.push({ category: cat.key, value: cat.value });
+      }
+    }
+  
+    if (localRecord || globalRecord) {
+      this.add.text(centerX, centerY, 'New record! Enter your name:', {
+        fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5).setDepth(1001);
+  
+      if (isMobile()) {
+        const name = prompt('New record! Enter your name:');
+        if (name) {
+          for (const score of newScores) {
+            await highScoreManager.saveScore({ ...score, name });
+          }
+          this.scene.start('HighScoreScene');
+        }
+      } else {
+        this.inputText = '';
+        const nameText = this.add.text(centerX, centerY + 40, 'NAME: ', {
+          fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+        }).setOrigin(0.5).setDepth(1001);
+  
+        this.input.keyboard.on('keydown', async (event) => {
+          if (event.key === 'Backspace') {
+            this.inputText = this.inputText.slice(0, -1);
+          } else if (event.key.length === 1 && this.inputText.length < 12) {
+            this.inputText += event.key.toUpperCase();
+          } else if (event.key === 'Enter') {
+            for (const score of newScores) {
+              await highScoreManager.saveScore({ ...score, name: this.inputText });
+            }
+            this.scene.start('HighScoreScene');
+          }
+          nameText.setText('NAME: ' + this.inputText);
         });
-    });
-    
-    // Still allow space key on desktop
-    this.input.keyboard.once('keydown-SPACE', () => {
-        this.scene.start('HighScoreScene', {
-        distance: this.distance,
-        elapsedTimeMs: this.elapsedTimeMs,
-        score: this.score
+      }
+    } else {
+      this.add.text(centerX, centerY, 'Better luck next time!', {
+        fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5).setDepth(1001);
+  
+      const infoText = isMobile()
+        ? 'Tap screen for highscores'
+        : 'Press SPACE for highscores';
+  
+      this.add.text(centerX, centerY + 40, infoText, {
+        fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5).setDepth(1001);
+  
+      if (isMobile()) {
+        this.input.once('pointerdown', () => {
+          this.scene.start('HighScoreScene');
         });
-    });
-
+      } else {
+        this.input.keyboard.once('keydown-SPACE', () => {
+          this.scene.start('HighScoreScene');
+        });
+      }
+    }
+  
+    // Change to non-game music
     this.sound.get('music_game')?.stop();
     if (!this.sound.get('music_start')) {
       this.sound.add('music_start', { loop: true, volume: 0.5 });

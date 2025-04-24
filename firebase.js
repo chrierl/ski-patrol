@@ -3,6 +3,7 @@
 // Import Firebase SDK functions
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { isMobile } from './helpers.js';
 
 const firebaseConfig = {
     apiKey: "AIzaSyA6FN38SHcDWRCk8UYAkZT6nV5tFQuoLac",
@@ -17,21 +18,39 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Platform detection: desktop vs mobile
-function isMobileDevice() {
-  return /Mobi|Android/i.test(navigator.userAgent);
-}
-
 // Upload a score to Firestore
 export async function uploadGlobalScore(category, name, value) {
-  const platform = isMobileDevice() ? 'mobile' : 'desktop';
+  const platform = isMobile() ? 'mobile' : 'desktop';
+  const colRef = collection(db, 'highscores', platform, category);
+  const timestamp = Date.now();
+
+  console.log(`🌍 Uploading global score to Firestore:
+  📂 Platform: ${platform}
+  🏷️ Category: ${category}
+  👤 Name: ${name}
+  📈 Value: ${value}
+  ⏰ Timestamp: ${timestamp}
+  📁 Collection path: highscores/${platform}/${category}`);
+
+  try {
+    await addDoc(colRef, { name, value, timestamp });
+    console.log('✅ Upload successful!');
+  } catch (err) {
+    console.error('❌ Upload failed:', err);
+  }
+}
+
+/*
+// Upload a score to Firestore
+export async function uploadGlobalScore(category, name, value) {
+  const platform = isMobile() ? 'mobile' : 'desktop';
   const colRef = collection(db, 'highscores', platform, category);
   await addDoc(colRef, { name, value, timestamp: Date.now() });
-}
+} */
 
 // Get top 10 scores from Firestore
 export async function fetchGlobalScores(category) {
-  const platform = isMobileDevice() ? 'mobile' : 'desktop';
+  const platform = isMobile() ? 'mobile' : 'desktop';
   const colRef = collection(db, 'highscores', platform, category);
   const q = query(colRef, orderBy('value', 'desc'), limit(10));
   const snapshot = await getDocs(q);
