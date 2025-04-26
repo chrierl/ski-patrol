@@ -1,5 +1,6 @@
 // StartScene.js
 import { objectConfigs, weightedPick } from './objectConfigs.js';
+import { isMobile, createButton } from './helpers.js';
 
 export default class StartScene extends Phaser.Scene {
   constructor() {
@@ -52,52 +53,46 @@ export default class StartScene extends Phaser.Scene {
       .setDisplaySize(this.scale.height * 0.3 * 0.75, this.scale.height * 0.3)
       .setDepth(1000);
 
-    this.startText = this.add.text(this.scale.width / 2, 500, 'Press SPACE to play', {
-      fontSize: '16px', fill: '#020202', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5).setDepth(1000);
+    this.setupStartScreen();
 
-    this.startText = this.add.text(this.scale.width / 2, 560, 'Press ENTER for high scores', {
-        fontSize: '16px', fill: '#020202', fontFamily: '"Press Start 2P"'
-      }).setOrigin(0.5).setDepth(1000);
+  }
 
-    // Skip difficulty
-    /*this.difficultyText = this.add.text(this.scale.width / 2, 560, 'Difficulty: Normal', {
-      fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5).setDepth(1000); */
-
-    // Förhindra att musiken startar automatiskt innan interaktion
-    this.input.once('pointerdown', () => this.startMusic());
-    this.input.keyboard.once('keydown', () => this.startMusic());
-
-    this.input.keyboard.once('keydown-SPACE', () => {
-      const selected = this.difficultyOptions[this.difficultyIndex];
-      this.scene.start('MainScene', { difficulty: selected });
-    });
-
-    this.input.keyboard.on('keydown-ENTER', () => {
-        const selected = this.difficultyOptions[this.difficultyIndex];
-        this.scene.start('HighScoreScene', { difficulty: selected });
+  setupStartScreen() {
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+  
+    if (isMobile()) {
+      // 📱 Mobil: Visa knappar
+      createButton(this, centerX, centerY + 20, 'START', () => {
+        this.scene.start('MainScene');
       });
-
-    this.input.keyboard.on('keydown-LEFT', () => {
-      //this.difficultyIndex = (this.difficultyIndex + 3) % 4;
-      //this.updateDifficultyText();
-    });
-
-    this.input.keyboard.on('keydown-RIGHT', () => {
-      //this.difficultyIndex = (this.difficultyIndex + 1) % 4;
-      //this.updateDifficultyText();
-    });
-
-    this.updateDifficultyText = () => {
-      const label = this.difficultyOptions[this.difficultyIndex];
-      //this.difficultyText.setText('Difficulty: ' + label);
-    };
-
-    this.input.on('pointerdown', () => {
-        const selected = this.difficultyOptions[this.difficultyIndex];
-        this.scene.start('MainScene', { difficulty: selected });
+  
+      createButton(this, centerX, centerY + 100, 'HIGH SCORES', () => {
+        this.scene.start('HighScoreScene');
       });
+    } else {
+      // 🖥️ Desktop: Visa textinstruktioner istället
+      this.add.text(centerX, centerY + 60, 'PRESS SPACE TO START', {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '14px',
+        color: '#222222'
+      }).setOrigin(0.5);
+  
+      this.add.text(centerX, centerY + 100, 'PRESS ENTER FOR HIGH SCORES', {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '14px',
+        color: '#222222'
+      }).setOrigin(0.5);
+  
+      // Lägg till tangentlyssnare
+      this.input.keyboard.once('keydown-SPACE', () => {
+        this.scene.start('MainScene');
+      });
+  
+      this.input.keyboard.once('keydown-ENTER', () => {
+        this.scene.start('HighScoreScene');
+      });
+    }
   }
 
   update() {

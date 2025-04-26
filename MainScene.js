@@ -2,7 +2,7 @@
 import { objectConfigs, weightedPick } from './objectConfigs.js';
 import { addTouchControlGrid } from './TouchControls.js';
 import { highScoreManager } from './game.js';
-import { isMobile } from './helpers.js';
+import { isMobile, createButton } from './helpers.js';
 
 function textStyle() {
     return {
@@ -39,7 +39,7 @@ export default class MainScene extends Phaser.Scene {
     this.minSpeed = 2;
     this.maxSpeed = 10;
     this.elapsedTimeMs = 0;
-    this.remainingTimeMs = 30 * 1000;
+    this.remainingTimeMs = 5 * 1000;
     this.spawnAccumulator = 0;
     this.spawnPadding = 10;
     const referenceWidth = 680; // original width
@@ -297,6 +297,135 @@ update(time, delta) {
     const centerX = this.scale.width / 2;
     const centerY = this.scale.height / 2;
   
+    // Ta bort spelknappar på mobil
+    if (this.touchControls) {
+      this.touchControls.clear(true, true); // Destroy alla kontroller + events
+      this.touchControls = null;            // Ta bort referensen
+    }
+
+    // Bakgrund
+    this.add.rectangle(centerX, centerY, this.scale.width, this.scale.height, 0x000000, 0.7)
+      .setOrigin(0.5)
+      .setDepth(999);
+  
+    // Game Over text
+    this.add.text(centerX, centerY - 80, 'GAME OVER', {
+      fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5).setDepth(1001);
+  
+    // 🔎 Kolla om något rekord slagits
+    const categories = [
+      { key: 'distance', value: Math.round(this.distance / 20) },
+      { key: 'time', value: parseFloat((this.elapsedTimeMs / 1000).toFixed(1)) },
+      { key: 'items', value: this.score }
+    ];
+  
+    let localRecord = false;
+    let globalRecord = false;
+    const newScores = [];
+  
+    for (const cat of categories) {
+      if (await highScoreManager.isLocalRecord(cat.key, cat.value)) {
+        localRecord = true;
+        newScores.push({ category: cat.key, value: cat.value });
+      } else if (await highScoreManager.isGlobalRecord(cat.key, cat.value)) {
+        globalRecord = true;
+        newScores.push({ category: cat.key, value: cat.value });
+      }
+    }
+  
+    const hadRecord = localRecord || globalRecord;
+  
+    if (hadRecord) {
+      // ✨ Rekord - Be om namn
+      this.add.text(centerX, centerY - 20, 'NEW RECORD! ENTER YOUR NAME', {
+        fontSize: '14px', fill: '#FFFFFF', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5).setDepth(1001);
+  
+      if (isMobile()) {
+        // Mobil: visa knapp för att mata in namn
+        createButton(this, centerX, centerY + 40, 'Enter Name', async () => {
+          const name = prompt('Enter your name:');
+          if (name) {
+            for (const score of newScores) {
+              await highScoreManager.saveScore({ ...score, name: name.toUpperCase().substring(0, 12) });
+            }
+            this.scene.start('HighScoreScene');
+          }
+        });
+      } else {
+        // Desktop: skriv namn och tryck Enter
+        this.inputText = '';
+        const nameText = this.add.text(centerX, centerY + 40, 'NAME: ', {
+          fontSize: '14px', fill: '#FFFFFF', fontFamily: '"Press Start 2P"'
+        }).setOrigin(0.5).setDepth(1001);
+  
+        this.input.keyboard.on('keydown', async (event) => {
+          if (event.key === 'Backspace') {
+            this.inputText = this.inputText.slice(0, -1);
+          } else if (event.key.length === 1 && this.inputText.length < 12) {
+            this.inputText += event.key.toUpperCase();
+          } else if (event.key === 'Enter') {
+            for (const score of newScores) {
+              await highScoreManager.saveScore({ ...score, name: this.inputText });
+            }
+            this.scene.start('HighScoreScene');
+          }
+          nameText.setText('NAME: ' + this.inputText);
+        });
+      }
+  
+    } else {
+      // 😢 Inget rekord
+      this.add.text(centerX, centerY - 20, 'BETTER LUCK NEXT TIME!', {
+        fontSize: '14px', fill: '#FFFFFF', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5).setDepth(1001);
+  
+      if (isMobile()) {
+        // Mobil: knapp för att fortsätta
+        createButton(this, centerX, centerY + 40, 'Continue', () => {
+          this.scene.start('StartScene');
+        });
+      } else {
+        // Desktop: SPACE för att fortsätta
+        this.add.text(centerX, centerY + 40, 'PRESS SPACE TO CONTINUE', {
+          fontSize: '14px', fill: '#FFFFFF', fontFamily: '"Press Start 2P"'
+        }).setOrigin(0.5).setDepth(1001);
+  
+        this.input.keyboard.once('keydown-SPACE', () => {
+          this.scene.start('StartScene');
+        });
+      }
+    }
+  
+    // 🎵 Byt till startmusiken
+    this.sound.get('music_game')?.stop();
+    if (!this.sound.get('music_start')) {
+      this.sound.add('music_start', { loop: true, volume: 0.5 });
+    }
+    this.sound.get('music_start').play();
+  }
+
+
+  /*
+  async endGame() {
+    this.gameOver = true;
+    this.scrollSpeedY = 0;
+    this.lateralSpeed = 0;
+  
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
+  
+    // Bakgrund för Game Over-texter
+    const background = this.add.rectangle(
+      this.scale.width / 2, 
+      this.scale.height / 2, 
+      this.scale.width, 
+      this.scale.height, 
+      0x000000, 
+      0.7 // Opacitet mellan 0 (transparent) och 1 (helt svart)
+    ).setOrigin(0.5).setDepth(999);
+
     this.add.text(centerX, centerY - 60, 'GAME OVER', {
       fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5).setDepth(1001);
@@ -307,6 +436,7 @@ update(time, delta) {
       { key: 'items', value: this.score }
     ];
   
+
     // Kolla om något rekord slagits
     let localRecord = false;
     let globalRecord = false;
@@ -369,7 +499,18 @@ update(time, delta) {
       }).setOrigin(0.5).setDepth(1001);
   
       if (isMobile()) {
-        this.input.once('pointerdown', () => {
+        const continueButton = this.add.rectangle(centerX, centerY + 100, 180, 40, 0x00aa00)
+          .setOrigin(0.5)
+          .setStrokeStyle(2, 0xffffff)
+          .setInteractive()
+          .setDepth(1001);
+        const continueText = this.add.text(centerX, centerY + 100, 'CONTINUE', {
+          fontSize: '12px',
+          fill: '#ffffff',
+          fontFamily: '"Press Start 2P"'
+        }).setOrigin(0.5).setDepth(1002);
+      
+        continueButton.on('pointerdown', () => {
           this.scene.start('HighScoreScene');
         });
       } else {
@@ -385,7 +526,7 @@ update(time, delta) {
       this.sound.add('music_start', { loop: true, volume: 0.5 });
     }
     this.sound.get('music_start').play();
-  }
+  } */
 
   createObstacle(config) {
     const x = Phaser.Math.Between(this.spawnPadding, this.scale.width - this.spawnPadding);

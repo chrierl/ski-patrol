@@ -1,6 +1,10 @@
 // TouchControls.js
 
 export function addTouchControlGrid(scene, layoutConfig = {}) {
+    if (!scene.touchControls) {
+      scene.touchControls = scene.add.group();
+    }
+  
     const screenW = scene.scale.width;
     const screenH = scene.scale.height;
   
@@ -49,12 +53,14 @@ export function addTouchControlGrid(scene, layoutConfig = {}) {
           .setOrigin(0.5)
           .setDepth(1000)
           .setInteractive({ useHandCursor: false });
+        scene.touchControls.add(bg);
   
         const label = scene.add.text(startX + width / 2, startY + height / 2, labels[row][col], {
           fontSize: `${Math.floor(height * 0.4)}px`,
           fill: '#ffffff',
           fontFamily: '"Press Start 2P"'
         }).setOrigin(0.5).setAlpha(0.2).setDepth(1001);
+        scene.touchControls.add(label);
   
         const index = row * 3 + col; 
         bg.on('pointerdown', (pointer) => { if (!scene.gamePaused) actions[index](); });          
