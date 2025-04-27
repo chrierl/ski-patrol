@@ -39,7 +39,7 @@ export default class MainScene extends Phaser.Scene {
     this.minSpeed = 2;
     this.maxSpeed = 10;
     this.elapsedTimeMs = 0;
-    this.remainingTimeMs = 5 * 1000;
+    this.remainingTimeMs = 30 * 1000;
     this.spawnAccumulator = 0;
     this.spawnPadding = 10;
     const referenceWidth = 680; // original width
