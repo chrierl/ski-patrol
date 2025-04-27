@@ -70,11 +70,23 @@ export default class HighScoreScene extends Phaser.Scene {
   
     const isMobileDevice = isMobile();
   
-    if (isMobileDevice) {
-      this.drawVerticalLayout();
-    } else {
-      this.drawHorizontalLayout();
-    }
+    this.categories.forEach((cat, index) => {
+      const scores = this.showingGlobal
+        ? this.globalScores[cat.key] || []
+        : this.localScores[cat.key] || [];
+    
+      if (!isMobileDevice) {
+        // Desktop = horizontal layout
+        const x = (width / 2) + (index - 1) * 300;
+        const y = 160;
+        this.drawScoreList(cat.label, scores, x, y);
+      } else {
+        // Mobile = vertical layout
+        const x = width / 2;
+        const y = 160 + index * 200;
+        this.drawScoreList(cat.label, scores, x, y);
+      }
+    });
   
     if (!isMobileDevice) {
       const continueText = this.add.text(width / 2, this.scale.height - 80, 'PRESS ESC TO RETURN', {
@@ -87,72 +99,37 @@ export default class HighScoreScene extends Phaser.Scene {
       this.highscoreTexts.push(switchText);
     }
   }
-  
 
-  drawVerticalLayout() {
-    const width = this.scale.width;
-    let yOffset = 170;
+  drawScoreList(categoryLabel, scores, startX, startY) {
+    const title = this.add.text(startX, startY, categoryLabel, {
+      fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5);
   
-    this.categories.forEach(cat => {
-      const scores = this.showingGlobal
-        ? this.globalScores[cat.key] || []
-        : this.localScores[cat.key] || [];
+    this.highscoreTexts.push(title);
   
-      const label = this.add.text(width / 2, yOffset, cat.label, {
-        fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
-      }).setOrigin(0.5);
-      this.highscoreTexts.push(label);
+    scores.forEach((entry, i) => {
+      const rank = `${i + 1}.`.padStart(4, ' ');
+      const name = (entry.name || '---').padEnd(12, ' ');
+      const val = String(entry.value ?? '').padStart(5, ' ');
+      const text = `${rank} ${name} ${val}`;
+      
+      const y = startY + 20 + i * 16;
   
-      scores.forEach((entry, i) => {
-        const rank = `${i + 1}.`.padStart(4, ' ');
-        const name = (entry.name || '---').padEnd(12, ' ');
-        const val = String(entry.value ?? '').padStart(5, ' ');
-        const text = `${rank} ${name} ${val}`;
-        const estimatedTextWidth = 260;
-        const listX = width / 2 - estimatedTextWidth / 2;
-        const scoreText = this.add.text(listX, yOffset + 20 + i * 16, text, {
-          fontSize: '10px', fill: '#020202', fontFamily: '"Press Start 2P"'
-        }).setOrigin(0, 0.5);
-        this.highscoreTexts.push(scoreText);
+      const scoreText = this.add.text(startX, y, text, {
+        fontSize: '10px', fill: '#020202', fontFamily: '"Press Start 2P"'
+      }).setOrigin(0.5, 0.5).setAlpha(0);
+  
+      this.tweens.add({
+        targets: scoreText,
+        alpha: 1,
+        duration: 500,
+        delay: i * 50
       });
   
-      yOffset += 200;
+      this.highscoreTexts.push(scoreText);
     });
   }
   
-  drawHorizontalLayout() {
-    const width = this.scale.width;
-    const availableWidth = width - 120; // some margins left/right
-    const columnWidth = availableWidth / this.categories.length;
-  
-    const startX = 60; // start after margin
-    const startY = 180;
-  
-    this.categories.forEach((cat, index) => {
-      const scores = this.showingGlobal
-        ? this.globalScores[cat.key] || []
-        : this.localScores[cat.key] || [];
-  
-      const colX = startX + index * columnWidth;
-  
-      const label = this.add.text(colX + columnWidth / 2, startY, cat.label, {
-        fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
-      }).setOrigin(0.5);
-      this.highscoreTexts.push(label);
-  
-      scores.forEach((entry, i) => {
-        const rank = `${i + 1}.`.padStart(4, ' ');
-        const name = (entry.name || '---').padEnd(10, ' ');
-        const val = String(entry.value ?? '').padStart(5, ' ');
-        const text = `${rank} ${name} ${val}`;
-        const scoreText = this.add.text(colX, startY + 20 + i * 16, text, {
-          fontSize: '10px', fill: '#020202', fontFamily: '"Press Start 2P"'
-        }).setOrigin(0, 0.5);
-        this.highscoreTexts.push(scoreText);
-      });
-    });
-  }
-
   createMobileButtons() {
     const width = this.scale.width;
     const height = this.scale.height;
