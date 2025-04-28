@@ -406,128 +406,6 @@ update(time, delta) {
     this.sound.get('music_start').play();
   }
 
-
-  /*
-  async endGame() {
-    this.gameOver = true;
-    this.scrollSpeedY = 0;
-    this.lateralSpeed = 0;
-  
-    const centerX = this.scale.width / 2;
-    const centerY = this.scale.height / 2;
-  
-    // Bakgrund för Game Over-texter
-    const background = this.add.rectangle(
-      this.scale.width / 2, 
-      this.scale.height / 2, 
-      this.scale.width, 
-      this.scale.height, 
-      0x000000, 
-      0.7 // Opacitet mellan 0 (transparent) och 1 (helt svart)
-    ).setOrigin(0.5).setDepth(999);
-
-    this.add.text(centerX, centerY - 60, 'GAME OVER', {
-      fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5).setDepth(1001);
-  
-    const categories = [
-      { key: 'distance', value: Math.round(this.distance / 20) },
-      { key: 'time', value: parseFloat((this.elapsedTimeMs / 1000).toFixed(1)) },
-      { key: 'items', value: this.score }
-    ];
-  
-
-    // Kolla om något rekord slagits
-    let localRecord = false;
-    let globalRecord = false;
-    const newScores = [];
-  
-    for (const cat of categories) {
-      if (highScoreManager.isLocalRecord(cat.key, cat.value)) {
-        localRecord = true;
-        newScores.push({ category: cat.key, value: cat.value });
-      } else if (await highScoreManager.isGlobalRecord(cat.key, cat.value)) {
-        globalRecord = true;
-        newScores.push({ category: cat.key, value: cat.value });
-      }
-    }
-  
-    if (localRecord || globalRecord) {
-      this.add.text(centerX, centerY, 'New record! Enter your name:', {
-        fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-      }).setOrigin(0.5).setDepth(1001);
-  
-      if (isMobile()) {
-        const name = prompt('New record! Enter your name:');
-        if (name) {
-          for (const score of newScores) {
-            await highScoreManager.saveScore({ ...score, name });
-          }
-          this.scene.start('HighScoreScene');
-        }
-      } else {
-        this.inputText = '';
-        const nameText = this.add.text(centerX, centerY + 40, 'NAME: ', {
-          fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-        }).setOrigin(0.5).setDepth(1001);
-  
-        this.input.keyboard.on('keydown', async (event) => {
-          if (event.key === 'Backspace') {
-            this.inputText = this.inputText.slice(0, -1);
-          } else if (event.key.length === 1 && this.inputText.length < 12) {
-            this.inputText += event.key.toUpperCase();
-          } else if (event.key === 'Enter') {
-            for (const score of newScores) {
-              await highScoreManager.saveScore({ ...score, name: this.inputText });
-            }
-            this.scene.start('HighScoreScene');
-          }
-          nameText.setText('NAME: ' + this.inputText);
-        });
-      }
-    } else {
-      this.add.text(centerX, centerY, 'Better luck next time!', {
-        fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-      }).setOrigin(0.5).setDepth(1001);
-  
-      const infoText = isMobile()
-        ? 'Tap screen for highscores'
-        : 'Press SPACE for highscores';
-  
-      this.add.text(centerX, centerY + 40, infoText, {
-        fontSize: '12px', fill: '#ffffff', fontFamily: '"Press Start 2P"'
-      }).setOrigin(0.5).setDepth(1001);
-  
-      if (isMobile()) {
-        const continueButton = this.add.rectangle(centerX, centerY + 100, 180, 40, 0x00aa00)
-          .setOrigin(0.5)
-          .setStrokeStyle(2, 0xffffff)
-          .setInteractive()
-          .setDepth(1001);
-        const continueText = this.add.text(centerX, centerY + 100, 'CONTINUE', {
-          fontSize: '12px',
-          fill: '#ffffff',
-          fontFamily: '"Press Start 2P"'
-        }).setOrigin(0.5).setDepth(1002);
-      
-        continueButton.on('pointerdown', () => {
-          this.scene.start('HighScoreScene');
-        });
-      } else {
-        this.input.keyboard.once('keydown-SPACE', () => {
-          this.scene.start('HighScoreScene');
-        });
-      }
-    }
-  
-    // Change to non-game music
-    this.sound.get('music_game')?.stop();
-    if (!this.sound.get('music_start')) {
-      this.sound.add('music_start', { loop: true, volume: 0.5 });
-    }
-    this.sound.get('music_start').play();
-  } */
-
   createObstacle(config) {
     const x = Phaser.Math.Between(this.spawnPadding, this.scale.width - this.spawnPadding);
     const y = this.scale.height + Phaser.Math.Between(50, 150);
@@ -537,6 +415,9 @@ update(time, delta) {
         const angleDeg = Phaser.Math.Between(-config.rotation, config.rotation);
         sprite.setAngle(angleDeg);
       }
+    if (config.mirror && Math.random() < 0.5) {
+      sprite.flipX = true;
+    }  
     sprite.customHitbox = config.hitbox;
     sprite.setDepth(400);
     this.obstacles.add(sprite);

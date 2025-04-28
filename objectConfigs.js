@@ -2,28 +2,64 @@ export const objectConfigs = [
     {
       type: 'obstacle',
       sprite: 'tree',
-      weight: 30,
+      weight: 20,
       scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
       hitbox: { x: 0.3, y: 0.50, width: 0.4, height: 0.35 },
+      mirror: true,
       config() {
         return {
           sprite: this.sprite,
           scale: this.scale(),
-          hitbox: this.hitbox
+          hitbox: this.hitbox,
+          mirror: this.mirror
+        };
+      }
+    },
+    {
+      type: 'obstacle',
+      sprite: 'tree_snowy',
+      weight: 10,
+      scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
+      hitbox: { x: 0.3, y: 0.50, width: 0.4, height: 0.35 },
+      mirror: true,
+      config() {
+        return {
+          sprite: this.sprite,
+          scale: this.scale(),
+          hitbox: this.hitbox,
+          mirror: this.mirror
         };
       }
     },
     {
       type: 'obstacle',
       sprite: 'rock',
-      weight: 8,
+      weight: 5,
       scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
       hitbox: { x: 0.25, y: 0.5, width: 0.5, height: 0.3 },
+      mirror: true,
       config() {
         return {
           sprite: this.sprite,
           scale: this.scale(),
-          hitbox: this.hitbox
+          hitbox: this.hitbox,
+          mirror: this.mirror
+        };
+      }
+    },
+    {
+      type: 'obstacle',
+      sprite: 'rock_narrow',
+      weight: 3,
+      scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
+      hitbox: { x: 0.30, y: 0.4, width: 0.4, height: 0.4 },
+      mirror: true,
+      config() {
+        return {
+          sprite: this.sprite,
+          scale: this.scale(),
+          hitbox: this.hitbox,
+          mirror: this.mirror
         };
       }
     },
@@ -47,11 +83,13 @@ export const objectConfigs = [
       weight: 1,
       scale: () => 0.20,
       hitbox: { x: 0.05, y: 0.5, width: 0.9, height: 0.25 },
+      mirror: true,
       config() {
         return {
           sprite: this.sprite,
           scale: this.scale(),
-          hitbox: this.hitbox
+          hitbox: this.hitbox,
+          mirror: this.mirror
         };
       }
     },

@@ -9,7 +9,9 @@ export default class StartScene extends Phaser.Scene {
 
   preload() {
     this.load.image('tree', 'assets/tree.png');
+    this.load.image('tree_snowy', 'assets/tree_snowy.png');
     this.load.image('rock', 'assets/rock.png');
+    this.load.image('rock_narrow', 'assets/rock_narrow.png');
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('groomer', 'assets/groomer.png');
     this.load.image('simon', 'assets/simon.png'); 
@@ -39,6 +41,9 @@ export default class StartScene extends Phaser.Scene {
         if (conf.rotation) {
             const angleDeg = Phaser.Math.Between(-conf.rotation, conf.rotation);
             obj.setAngle(angleDeg);
+        }
+        if (conf.mirror && Math.random() < 0.5) {
+          obj.flipX = true;
         }
         this.objects.add(obj);
       }
