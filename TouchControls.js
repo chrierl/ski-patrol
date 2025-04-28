@@ -31,16 +31,16 @@ export function addTouchControlGrid(scene, layoutConfig = {}) {
     ];
   
     const actions = [
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
-        () => { if (!scene.gamePaused) { scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; } },
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = 0; } },
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; } },
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
-        () => { if (!scene.gamePaused) { scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
-        () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
-      ];
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = 0; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.max(scene.minSpeed, scene.scrollSpeedY - 1); } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = 0; } },  // <--- CENTER BUTTON (stop steering left/right)
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = 1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = 0; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
+      () => { if (!scene.gamePaused) { scene.lateralSpeed = -1.5; scene.scrollSpeedY = Math.min(scene.maxSpeed, scene.scrollSpeedY + 1); } },
+    ];
   
     let startX = areaLeft;
     for (let col = 0; col < 3; col++) {
