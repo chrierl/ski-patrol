@@ -7,6 +7,7 @@ export default class StartScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('logo', 'assets/ski_patrol_logo.png');
     this.load.image('tree', 'assets/tree.png');
     this.load.image('tree_snowy', 'assets/tree_snowy.png');
     this.load.image('rock', 'assets/rock.png');
@@ -47,9 +48,16 @@ export default class StartScene extends Phaser.Scene {
       }
     });
 
-    this.titleText = this.add.text(this.scale.width / 2, 200, 'Ski Patrol!', {
-      fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
-    }).setOrigin(0.5).setDepth(1000);
+    const centerX = this.scale.width / 2;
+    const height = this.scale.height;
+    this.titleLogo = this.add.sprite(centerX, 150,'logo')
+      .setOrigin(0.5)
+      .setDisplaySize(height * 0.5, height * 0.4)
+      .setDepth(1000);
+
+//    this.titleText = this.add.text(this.scale.width / 2, 200, 'Ski Patrol!', {
+ //     fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
+  //  }).setOrigin(0.5).setDepth(1000);
 
     // Read stored skier from settings in localstorage
     const storedSkier = JSON.parse(localStorage.getItem('selectedSkier'));

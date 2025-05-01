@@ -24,6 +24,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create(data = {}) {
+    this.ready = false;
     this.score = 0;
     this.distance = 0;
     this.scrollSpeedY = 2;
@@ -98,13 +99,14 @@ initGame() {
       startMusic.stop();
     }
 
-    if (this.sound.get('music_game')) {
-      this.sound.get('music_game').stop();
-    }
+
     const saved = JSON.parse(localStorage.getItem('selectedSong'));
     const musicKey = saved?.file?.replace('.mp3', '') || 'music_game';
-    const music = this.sound.add(musicKey, { loop: true, volume: 0.5 });
-    music.play();
+    if (this.sound.get(musicKey)) {
+      this.sound.get(musicKey).stop();
+    }
+    this.music = this.sound.add(musicKey, { loop: true, volume: 0.5 });
+    this.music.play();
 
     this.pickupSound = this.sound.add('pickup');
 
@@ -441,9 +443,8 @@ update(time, delta) {
     }
   
     // 🎵 Byt till startmusiken
-    this.sound.get('music_game')?.stop();
-    if (!this.sound.get('music_start')) {
-      this.sound.add('music_start', { loop: true, volume: 0.5 });
+    if (this.music && this.music.isPlaying) {
+      this.music.stop();
     }
     this.sound.get('music_start').play();
   }

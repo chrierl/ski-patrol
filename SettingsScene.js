@@ -109,7 +109,7 @@ export default class SettingsScene extends Phaser.Scene {
       this.changeSelection('song');
     });
 
-    createButton(this, centerX, bottom - 80, 'Exit', () => {
+    createButton(this, centerX, bottom - 80, 'Back', () => {
       this.saveSelection();
       this.scene.start('StartScene');
     }, { color: 0xe34234 });
@@ -118,7 +118,7 @@ export default class SettingsScene extends Phaser.Scene {
   createDesktopInstructions() {
     const centerX = this.scale.width / 2;
     this.add.text(centerX, this.scale.height - 40,
-      '↑↓ Switch Field   ←→ Change Option   ESC to Exit', {
+      '↑↓ Switch Field   ←→ Change Option   ESC to Go Back', {
         fontSize: '10px',
         fill: '#222222',
         fontFamily: '"Press Start 2P"'
