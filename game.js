@@ -3,6 +3,7 @@ import StartScene from './StartScene.js';
 import MainScene from './MainScene.js';
 import HighScoreScene from './HighScoreScene.js';
 import HighScoreManager from './HighScoreManager.js';
+import SettingsScene from './SettingsScene.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6FN38SHcDWRCk8UYAkZT6nV5tFQuoLac",
@@ -33,7 +34,7 @@ const config = {
       debug: false
     }
   },
-  scene: [StartScene, MainScene, HighScoreScene],
+  scene: [StartScene, MainScene, HighScoreScene, SettingsScene],
   scale: {
     mode: Phaser.Scale.NONE, // inget autoscale – vi kör raw
     autoCenter: Phaser.Scale.NO_CENTER

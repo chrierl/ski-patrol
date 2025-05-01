@@ -18,11 +18,8 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('skier', 'assets/skier.png');
-    this.load.image('skier_left', 'assets/skier_left.png');
-    this.load.image('skier_right', 'assets/skier_right.png');
-    this.load.image('skier_crash', 'assets/skier_crash.png');
     this.load.image('stars', 'assets/stars.png');
+    //this.load.sound('pickup', 'assets/pickup.wav');
     objectConfigs.forEach(o => this.load.image(o.sprite, `assets/${o.sprite}.png`));
   }
 
@@ -52,6 +49,7 @@ export default class MainScene extends Phaser.Scene {
       Insane:  { obstacle: 0.15, collectible: 0.03 }
     };
 
+    // Spawn settings
     const difficulty = data.difficulty || 'Normal';
     const settings = difficultyMap[difficulty];
     this.obstacleSpawnChance = settings.obstacle;
@@ -59,14 +57,56 @@ export default class MainScene extends Phaser.Scene {
     this.adjustedObstacleChance = this.obstacleSpawnChance * widthScaleFactor;
     this.adjustedCollectibleChance = this.collectibleSpawnChance * widthScaleFactor;
 
-    this.pickupSound = this.sound.add('pickup');
-    if (this.sound.get('music_start')) {
-        this.sound.get('music_start').stop();
-      }
-    if (!this.sound.get('music_game')) {
-        this.sound.add('music_game', { loop: true, volume: 0.5 });
+    // Load skier sprites
+    let skierBase = 'skiers/skier'; // fallback
+    try {
+      const saved = JSON.parse(localStorage.getItem('selectedSkier'));
+      if (saved?.base) skierBase = saved.base;
+    } catch (e) {
+      console.warn('⚠️ Could not parse saved skier');
     }
-    this.sound.get('music_game').play();
+  
+    const loader = this.load;
+    loader.image('skier', `assets/${skierBase}.png`);
+    loader.image('skier_left', `assets/${skierBase}_left.png`);
+    loader.image('skier_right', `assets/${skierBase}_right.png`);
+    loader.image('skier_crash', `assets/${skierBase}_crash.png`);
+
+    // Load sounds
+    this.load.audio('pickup', 'assets/pickup.wav');
+
+    // Load game music
+    const saved = JSON.parse(localStorage.getItem('selectedSong'));
+    const musicFile = saved?.file || 'ski_patrol_theme.mp3';
+    const musicKey = musicFile.replace('.mp3', '');
+    
+    this.musicKey = musicKey; // spara för senare
+    
+    this.load.audio(musicKey, `assets/${musicFile}`);
+    
+    // När laddning är klar, kör initGame
+    this.load.once('complete', () => {
+      this.initGame();
+    });
+    this.load.start();
+}
+
+initGame() {
+    // Stop any music already playing, then start game music
+    const startMusic = this.sound.get('music_start');
+    if (startMusic && startMusic.isPlaying) {
+      startMusic.stop();
+    }
+
+    if (this.sound.get('music_game')) {
+      this.sound.get('music_game').stop();
+    }
+    const saved = JSON.parse(localStorage.getItem('selectedSong'));
+    const musicKey = saved?.file?.replace('.mp3', '') || 'music_game';
+    const music = this.sound.add(musicKey, { loop: true, volume: 0.5 });
+    music.play();
+
+    this.pickupSound = this.sound.add('pickup');
 
     this.obstacles = this.add.group();
     this.collectibles = this.add.group();
@@ -81,7 +121,7 @@ export default class MainScene extends Phaser.Scene {
     this.timeText = this.add.text(20, 100, 'Time: 60.0s', this.textStyle()).setDepth(1000);
     this.scoreText = this.add.text(20, 120, 'Pickups: 0', this.textStyle()).setDepth(1000);
     this.distanceText = this.add.text(20, 140, 'Distance: 0', this.textStyle()).setDepth(1000);
-  
+
     if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
         addTouchControlGrid(this, {
           columns: [0.3, 0.4, 0.3],
@@ -92,9 +132,11 @@ export default class MainScene extends Phaser.Scene {
           alpha: 0.10
         });
     }
+    this.ready = true;
 }
 
 update(time, delta) {
+    if (!this.ready) return; 
     if (this.gameOver) return;
   
     // Skip keyboard input if touch input was detected
