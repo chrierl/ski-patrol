@@ -7,7 +7,8 @@ export default class SettingsScene extends Phaser.Scene {
 
     this.skierOptions = [
         { name: 'Simon', base: 'skiers/skier' },
-        { name: 'Sofia', base: 'skiers/skier_blue' }
+        { name: 'Sofia', base: 'skiers/skier_blue' },
+        { name: 'Vader', base: 'skiers/skier_black' }
       ];
     this.musicOptions = [
       { name: 'Ski Patrol Theme', file: 'ski_patrol_theme.mp3' },

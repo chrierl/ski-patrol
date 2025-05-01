@@ -19,7 +19,7 @@ export default class MainScene extends Phaser.Scene {
 
   preload() {
     this.load.image('stars', 'assets/stars.png');
-    //this.load.sound('pickup', 'assets/pickup.wav');
+    this.load.image('bird', 'assets/bird.png');
     objectConfigs.forEach(o => this.load.image(o.sprite, `assets/${o.sprite}.png`));
   }
 
@@ -57,6 +57,7 @@ export default class MainScene extends Phaser.Scene {
     this.collectibleSpawnChance = settings.collectible;
     this.adjustedObstacleChance = this.obstacleSpawnChance * widthScaleFactor;
     this.adjustedCollectibleChance = this.collectibleSpawnChance * widthScaleFactor;
+    this.scheduleNextAmbient();
 
     // Load skier sprites
     let skierBase = 'skiers/skier'; // fallback
@@ -227,6 +228,39 @@ update(time, delta) {
         this.createCollectible(conf);
       }
     }
+  }
+
+  scheduleNextAmbient() {
+    const minDelay = 8000;  // 🕒 min 8 sec
+    const maxDelay = 20000; // 🕒 max 20 sec
+    const delay = Phaser.Math.Between(minDelay, maxDelay);
+  
+    this.time.delayedCall(delay, () => {
+      this.spawnAmbientObject();
+      this.scheduleNextAmbient(); // 👈 schedule again recursively
+    });
+  }
+
+  spawnAmbientObject() {
+    const ambientDefs = objectConfigs.filter(o => o.type === 'ambient');
+    const def = weightedPick(ambientDefs);
+    const conf = def.config();
+  
+    const startX = conf.direction === 'left' ? this.scale.width + 50 : -50;  
+    const ambient = this.add.sprite(startX, conf.y, def.sprite)
+      .setScale(conf.scale)
+      .setDepth(2000); // or whatever fits
+
+      if (conf.direction === 'left') {
+        ambient.flipX = true;
+      }
+  
+    this.tweens.add({
+      targets: ambient,
+      x: conf.direction === 'left' ? -100 : this.scale.width + 100,
+      duration: 10000 / conf.speed,
+      onComplete: () => ambient.destroy()
+    });
   }
 
   updateTime(delta) {
