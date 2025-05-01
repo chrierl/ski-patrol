@@ -437,7 +437,7 @@ update(time, delta) {
           const name = prompt('Enter your name:');
           if (name) {
             for (const score of newScores) {
-              await highScoreManager.saveScore({ ...score, name: name.toUpperCase().substring(0, 12) });
+              await highScoreManager.saveScore({ ...score, name: name.substring(0, 12).trim() });
             }
             this.scene.start('HighScoreScene');
           }
@@ -453,10 +453,10 @@ update(time, delta) {
           if (event.key === 'Backspace') {
             this.inputText = this.inputText.slice(0, -1);
           } else if (event.key.length === 1 && this.inputText.length < 12) {
-            this.inputText += event.key.toUpperCase();
+            this.inputText += event.key;
           } else if (event.key === 'Enter') {
             for (const score of newScores) {
-              await highScoreManager.saveScore({ ...score, name: this.inputText });
+              await highScoreManager.saveScore({ ...score, name: this.inputText.trim() });
             }
             this.scene.start('HighScoreScene');
           }

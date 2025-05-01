@@ -100,6 +100,15 @@ export default class HighScoreScene extends Phaser.Scene {
     }
   }
 
+  formatScore(category, value) {
+    if (category === 'Time Survived') {
+      const mins = Math.floor(value / 60);
+      const secs = Math.floor(value % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`.padStart(5, ' ');
+    }
+    return String(value ?? '').padStart(5, ' ');
+  }
+
   drawScoreList(categoryLabel, scores, startX, startY) {
     const title = this.add.text(startX, startY, categoryLabel, {
       fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
@@ -109,8 +118,9 @@ export default class HighScoreScene extends Phaser.Scene {
   
     scores.forEach((entry, i) => {
       const rank = `${i + 1}.`.padStart(4, ' ');
-      const name = (entry.name || '---').padEnd(12, ' ');
-      const val = String(entry.value ?? '').padStart(5, ' ');
+      const name = (entry.name || '---').trim().padEnd(12, ' ');
+      console.log('Cat: ' + categoryLabel + " Name: !" + entry.name + "!");
+      const val = this.formatScore(categoryLabel, entry.value);
       const text = `${rank} ${name} ${val}`;
       
       const y = startY + 20 + i * 16;
