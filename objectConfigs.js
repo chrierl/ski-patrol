@@ -135,7 +135,7 @@ export const objectConfigs = [
       weight: 2,
       scale: () => 0.04,
       points: 3,
-      timeBonus: 2000,
+      timeBonus: 3000,
       hitbox: { x: 0.15, y: 0.15, width: 0.3, height: 0.4 },
       rotation: 120,
       config() {

@@ -20,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
   preload() {
     this.load.image('stars', 'assets/stars.png');
     this.load.image('bird', 'assets/bird.png');
+    this.load.audio('crash', 'assets/crash.mp3');
     objectConfigs.forEach(o => this.load.image(o.sprite, `assets/${o.sprite}.png`));
   }
 
@@ -315,7 +316,6 @@ update(time, delta) {
       if (!this.gamePaused && Phaser.Geom.Intersects.RectangleToRectangle(skierBounds, bounds)) {
         this.score += obj.points || 0;
         this.scoreText.setText('Pickups: ' + this.score);
-        this.pickupSound.play({ volume: 1 });
 
         if (obj.timeBonus) {
           this.remainingTimeMs += obj.timeBonus;
@@ -323,6 +323,14 @@ update(time, delta) {
           this.time.delayedCall(500, () => {
             this.timeText.setColor('#020202');
           });
+          const detuneStep = -20;
+          const durationPerNote = 1000;
+          const numNotes = Math.floor(obj.timeBonus / durationPerNote);
+          
+          for (let i = 0; i < numNotes; i++) {
+            const detune = i * detuneStep;
+            this.sound.play('pickup', { detune });
+          }
         }
         obj.destroy();
       }
@@ -340,6 +348,8 @@ update(time, delta) {
     this.crashSkier.setPosition(this.player.x, this.player.y);
     this.stars.setPosition(this.player.x, this.player.y - 20);
     this.player.setVisible(false);
+
+    this.sound.play('crash');
 
     setTimeout(() => {
       this.debugGraphics.clear();
