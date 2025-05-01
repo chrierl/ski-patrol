@@ -194,7 +194,18 @@ export const objectConfigs = [
     {
       type: 'ambient',
       sprite: 'hang_glider',
-      weight: 5,
+      weight: 2,
+      config: () => ({
+        scale: 0.25,
+        speed: Phaser.Math.Between(1, 3),
+        direction: Math.random() < 0.5 ? 'left' : 'right',
+        y: Phaser.Math.Between(100, 300),
+      })
+    },
+    {
+      type: 'ambient',
+      sprite: 'hang_glider_sp',
+      weight: 3,
       config: () => ({
         scale: 0.25,
         speed: Phaser.Math.Between(1, 3),
