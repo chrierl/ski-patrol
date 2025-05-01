@@ -201,6 +201,17 @@ export const objectConfigs = [
         direction: Math.random() < 0.5 ? 'left' : 'right',
         y: Phaser.Math.Between(100, 300),
       })
+    },
+    {
+      type: 'ambient',
+      sprite: 'fog',
+      weight: 1,
+      config: () => ({
+        scale: () => Phaser.Math.FloatBetween(0.75, 2.0),
+        speed: Phaser.Math.Between(1, 3),
+        direction: Math.random() < 0.5 ? 'left' : 'right',
+        y: Phaser.Math.Between(100, 300),
+      })
     }
   ];
   
