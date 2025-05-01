@@ -115,7 +115,7 @@ initGame() {
     this.collectibles = this.add.group();
     this.debugGraphics = this.add.graphics();
 
-    this.player = this.add.sprite(this.scale.width / 2, 200, 'skier').setScale(0.1).setDepth(500);
+    this.player = this.add.sprite(this.scale.width / 2, 200, 'skier').setScale(0.1).setDepth(200);
     this.crashSkier = this.add.sprite(this.player.x, this.player.y, 'skier_crash').setScale(0.1).setVisible(false).setDepth(500);
     this.stars = this.add.sprite(this.player.x, this.player.y - 20, 'stars').setScale(0.08).setVisible(false).setDepth(501);
 
@@ -192,7 +192,8 @@ update(time, delta) {
     [...this.obstacles.getChildren(), ...this.collectibles.getChildren()].forEach(obj => {
       obj.y -= this.scrollSpeedY;
       obj.x += this.lateralSpeed;
-      obj.setDepth(obj.y > this.player.y ? 600 : 400);
+      obj.setDepth(obj.y);
+//      obj.setDepth(obj.y > this.player.y ? 600 : 400);
       if (obj.y < -50) obj.destroy();
     });
   }
