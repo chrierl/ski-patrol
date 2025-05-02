@@ -11,10 +11,10 @@ export default class SettingsScene extends Phaser.Scene {
         { name: 'Vader', base: 'skiers/skier_black' }
       ];
     this.musicOptions = [
-      { name: 'Ski Patrol Theme', file: 'ski_patrol_theme.mp3' },
-      { name: 'Chairlift Chill', file: 'chairlift_chill.mp3' },
-      { name: 'Pixel Peaks', file: 'pixel_peaks.mp3' },
-      { name: 'Downhill Rush', file: 'downhill_rush.mp3' }
+      { name: 'Ski Patrol Theme', file: 'audio/ski_patrol_theme.mp3' },
+      { name: 'Chairlift Chill', file: 'audio/chairlift_chill.mp3' },
+      { name: 'Pixel Peaks', file: 'audio/pixel_peaks.mp3' },
+      { name: 'Downhill Rush', file: 'audio/downhill_rush.mp3' }
     ];
 
     this.selectedSkierIndex = 0;
@@ -38,7 +38,7 @@ export default class SettingsScene extends Phaser.Scene {
       }
     }
     this.load.image('current_skier', `assets/${skierBase}_right.png`);
-    this.load.image('radio', `assets/radio.png`);
+    this.load.image('radio', `assets/sprites/radio.png`);
   }
 
   create() {

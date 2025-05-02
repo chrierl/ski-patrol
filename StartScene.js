@@ -7,21 +7,21 @@ export default class StartScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('logo', 'assets/ski_patrol_logo.png');
-    this.load.image('tree', 'assets/tree.png');
-    this.load.image('tree_snowy', 'assets/tree_snowy.png');
-    this.load.image('rock', 'assets/rock.png');
-    this.load.image('reindeer', 'assets/reindeer.png');
-    this.load.image('cabin', 'assets/cabin.png');
-    this.load.image('rock_narrow', 'assets/rock_narrow.png');
-    this.load.image('snowman', 'assets/snowman.png');
-    this.load.image('groomer', 'assets/groomer.png');
-    this.load.image('can', 'assets/can.png');
-    this.load.image('bottle', 'assets/bottle.png');
-    this.load.image('pole', 'assets/pole.png');
-    this.load.audio('music_start', 'assets/unfinished_paths.mp3');
-    this.load.audio('music_game', 'assets/ski_patrol_theme.mp3');
-    this.load.audio('pickup', 'assets/pickup.wav');
+    this.load.image('logo', 'assets/sprites/ski_patrol_logo.png');
+    this.load.image('tree', 'assets/sprites/tree.png');
+    this.load.image('tree_snowy', 'assets/sprites/tree_snowy.png');
+    this.load.image('rock', 'assets/sprites/rock.png');
+    this.load.image('reindeer', 'assets/sprites/reindeer.png');
+    this.load.image('cabin', 'assets/sprites/cabin.png');
+    this.load.image('rock_narrow', 'assets/sprites/rock_narrow.png');
+    this.load.image('snowman', 'assets/sprites/snowman.png');
+    this.load.image('groomer', 'assets/sprites/groomer.png');
+    this.load.image('can', 'assets/sprites/can.png');
+    this.load.image('bottle', 'assets/sprites/bottle.png');
+    this.load.image('pole', 'assets/sprites/pole.png');
+    this.load.audio('music_start', 'assets/audio/unfinished_paths.mp3');
+    this.load.audio('music_game', 'assets/audio/ski_patrol_theme.mp3');
+    this.load.audio('pickup', 'assets/audio/pickup.wav');
   }
 
   create() {

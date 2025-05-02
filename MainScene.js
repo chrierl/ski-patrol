@@ -18,10 +18,10 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('stars', 'assets/stars.png');
-    this.load.image('bird', 'assets/bird.png');
-    this.load.audio('crash', 'assets/crash.mp3');
-    objectConfigs.forEach(o => this.load.image(o.sprite, `assets/${o.sprite}.png`));
+    this.load.image('stars', 'assets/sprites/stars.png');
+    this.load.image('bird', 'assets/sprites/bird.png');
+    this.load.audio('crash', 'assets/audio/crash.mp3');
+    objectConfigs.forEach(o => this.load.image(o.sprite, `assets/sprites/${o.sprite}.png`));
   }
 
   create(data = {}) {
