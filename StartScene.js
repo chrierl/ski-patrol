@@ -14,7 +14,6 @@ export default class StartScene extends Phaser.Scene {
     this.load.image('rock_narrow', 'assets/rock_narrow.png');
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('groomer', 'assets/groomer.png');
-    this.load.image('simon', 'assets/simon.png'); 
     this.load.image('can', 'assets/can.png');
     this.load.image('bottle', 'assets/bottle.png');
     this.load.image('pole', 'assets/pole.png');
@@ -55,13 +54,9 @@ export default class StartScene extends Phaser.Scene {
       .setDisplaySize(height * 0.5, height * 0.4)
       .setDepth(1000);
 
-//    this.titleText = this.add.text(this.scale.width / 2, 200, 'Ski Patrol!', {
- //     fontSize: '32px', fill: '#E34234', fontFamily: '"Press Start 2P"'
-  //  }).setOrigin(0.5).setDepth(1000);
-
     // Read stored skier from settings in localstorage
     const storedSkier = JSON.parse(localStorage.getItem('selectedSkier'));
-    const skierImageBase = storedSkier?.base || 'skier';
+    const skierImageBase = storedSkier?.base || 'skiers/skier';
     const skierTextureKey = 'current_skier';
 
     if (this.textures.exists(skierTextureKey)) {
