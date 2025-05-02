@@ -75,6 +75,9 @@ export default class MainScene extends Phaser.Scene {
     loader.image('skier_right', `assets/${skierBase}_right.png`);
     loader.image('skier_crash', `assets/${skierBase}_crash.png`);
 
+    this.trailGraphics = this.add.graphics().setDepth(0);
+    this.trailPoints = { left: [], right: [] }; // Buffert för båda spår
+
     // Load sounds
     this.load.audio('pickup', 'assets/pickup.wav');
 
@@ -177,7 +180,8 @@ update(time, delta) {
         }
       }
     }
-  
+      
+    this.drawSkiTracks();
     this.moveObjects();
     this.updateDistance();
     this.updateTime(delta);
@@ -186,8 +190,58 @@ update(time, delta) {
     if (this.stars.visible) {
       this.stars.rotation += 0.1;
     }
+
+    if (!this.debugCircle) {
+      this.debugCircle = this.add.graphics();
+    }
   }
   
+  drawSkiTracks() {
+    // Ski tracks
+    const skiWidth = this.player.displayWidth * 0.1; // Avstånd mellan skidor
+    const skiTipY = this.player.y + this.player.displayHeight / 2 - 40;
+    const leftX = this.player.x - skiWidth;
+    const rightX = this.player.x + skiWidth;
+    
+    // Räkna hur mycket världen rört sig relativt spelaren
+    const deltaY = this.scrollSpeedY;
+    const deltaX = this.lateralSpeed;
+    
+    // Lägg till nya punkter
+    this.trailPoints.left.push({ x: leftX, y: skiTipY });
+    this.trailPoints.right.push({ x: rightX, y: skiTipY });
+    
+    // Flytta alla punkter uppåt och i sidled (världen rör sig uppåt)
+    this.trailPoints.left.forEach(p => {
+      p.y -= deltaY;
+      p.x += deltaX;
+    });
+    this.trailPoints.right.forEach(p => {
+      p.y -= deltaY;
+      p.x += deltaX;
+    });
+    
+    // Rensa punkter som lämnat skärmen
+    this.trailPoints.left = this.trailPoints.left.filter(p => p.y > 0);
+    this.trailPoints.right = this.trailPoints.right.filter(p => p.y > 0);
+    
+    // Rita spår
+    this.trailGraphics.clear();
+    this.trailGraphics.lineStyle(8, 0xdddddd, 0.5);
+    
+    const drawTrail = (points) => {
+      if (points.length < 2) return;
+      this.trailGraphics.beginPath();
+      this.trailGraphics.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        this.trailGraphics.lineTo(points[i].x, points[i].y);
+      }
+      this.trailGraphics.strokePath();
+    };
+    
+    drawTrail(this.trailPoints.left);
+    drawTrail(this.trailPoints.right);
+  }
 
   moveObjects() {
     [...this.obstacles.getChildren(), ...this.collectibles.getChildren()].forEach(obj => {
