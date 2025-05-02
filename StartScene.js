@@ -11,6 +11,8 @@ export default class StartScene extends Phaser.Scene {
     this.load.image('tree', 'assets/tree.png');
     this.load.image('tree_snowy', 'assets/tree_snowy.png');
     this.load.image('rock', 'assets/rock.png');
+    this.load.image('reindeer', 'assets/reindeer.png');
+    this.load.image('cabin', 'assets/cabin.png');
     this.load.image('rock_narrow', 'assets/rock_narrow.png');
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('groomer', 'assets/groomer.png');

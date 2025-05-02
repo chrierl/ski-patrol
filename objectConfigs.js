@@ -18,7 +18,7 @@ export const objectConfigs = [
     {
       type: 'obstacle',
       sprite: 'tree_snowy',
-      weight: 10,
+      weight: 15,
       scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
       hitbox: { x: 0.3, y: 0.50, width: 0.4, height: 0.35 },
       mirror: true,
@@ -34,7 +34,7 @@ export const objectConfigs = [
     {
       type: 'obstacle',
       sprite: 'rock',
-      weight: 5,
+      weight: 10,
       scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
       hitbox: { x: 0.25, y: 0.5, width: 0.5, height: 0.3 },
       mirror: true,
@@ -50,9 +50,41 @@ export const objectConfigs = [
     {
       type: 'obstacle',
       sprite: 'rock_narrow',
-      weight: 3,
+      weight: 8,
       scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
-      hitbox: { x: 0.30, y: 0.4, width: 0.4, height: 0.4 },
+      hitbox: { x: 0.30, y: 0.4, width: 0.4, height: 0.3 },
+      mirror: true,
+      config() {
+        return {
+          sprite: this.sprite,
+          scale: this.scale(),
+          hitbox: this.hitbox,
+          mirror: this.mirror
+        };
+      }
+    },
+    {
+      type: 'obstacle',
+      sprite: 'cabin',
+      weight: 2,
+      scale: () => 0.25,
+      hitbox: { x: 0.1, y: 0.5, width: 0.8, height: 0.4 },
+      mirror: true,
+      config() {
+        return {
+          sprite: this.sprite,
+          scale: this.scale(),
+          hitbox: this.hitbox,
+          mirror: this.mirror
+        };
+      }
+    },
+    {
+      type: 'obstacle',
+      sprite: 'reindeer',
+      weight: 2,
+      scale: () => 0.14,
+      hitbox: { x: 0.3, y: 0.2, width: 0.4, height: 0.6 },
       mirror: true,
       config() {
         return {
@@ -66,14 +98,16 @@ export const objectConfigs = [
     {
       type: 'obstacle',
       sprite: 'snowman',
-      weight: 4,
+      weight: 1,
       scale: () => 0.12,
       hitbox: { x: 0.3, y: 0.4, width: 0.4, height: 0.5 },
+      mirror: true,
       config() {
         return {
           sprite: this.sprite,
           scale: this.scale(),
-          hitbox: this.hitbox
+          hitbox: this.hitbox,
+          mirror: this.mirror
         };
       }
     },
