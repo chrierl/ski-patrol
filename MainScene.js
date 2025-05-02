@@ -377,6 +377,24 @@ update(time, delta) {
           this.time.delayedCall(500, () => {
             this.timeText.setColor('#020202');
           });
+
+          // Add bonus time text by the skier
+          const bonusSeconds = Math.round(obj.timeBonus / 1000);
+          const bonusText = this.add.text(this.player.x, this.player.y - 30, `+${bonusSeconds}s`, {
+            fontSize: '16px',
+            fill: '#FF0000',
+            fontFamily: '"Press Start 2P"'
+          }).setOrigin(0.5).setDepth(1010);
+
+          this.tweens.add({
+            targets: bonusText,
+            y: bonusText.y - 100,
+            alpha: 0,
+            duration: 2000,
+            ease: 'Power1',
+            onComplete: () => bonusText.destroy()
+          });
+
           const detuneStep = -20;
           const durationPerNote = 1000;
           const numNotes = Math.floor(obj.timeBonus / durationPerNote);
