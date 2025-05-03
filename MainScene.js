@@ -125,9 +125,9 @@ initGame() {
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.timeText = this.add.text(20, 100, 'Time: 60.0s', this.textStyle()).setDepth(1000);
-    this.scoreText = this.add.text(20, 120, 'Pickups: 0', this.textStyle()).setDepth(1000);
-    this.distanceText = this.add.text(20, 140, 'Distance: 0', this.textStyle()).setDepth(1000);
+    this.timeText = this.add.text(20, 40, 'Time: 60.0s', this.textStyle()).setDepth(1000);
+    this.scoreText = this.add.text(20, 60, 'Pickups: 0', this.textStyle()).setDepth(1000);
+    this.distanceText = this.add.text(20, 80, 'Distance: 0', this.textStyle()).setDepth(1000);
 
     if (this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
         addTouchControlGrid(this, {
@@ -226,19 +226,32 @@ update(time, delta) {
     this.trailPoints.right = this.trailPoints.right.filter(p => p.y > 0);
     
     // Rita spår
-    this.trailGraphics.clear();
-    this.trailGraphics.lineStyle(8, 0xdddddd, 0.5);
-    
     const drawTrail = (points) => {
       if (points.length < 2) return;
-      this.trailGraphics.beginPath();
-      this.trailGraphics.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) {
-        this.trailGraphics.lineTo(points[i].x, points[i].y);
-      }
-      this.trailGraphics.strokePath();
-    };
     
+      for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1];
+        const p2 = points[i];
+    
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+    
+        // Mappa avstånd till alpha
+        const minAlpha = 0.1;
+        const maxAlpha = 1.0;
+        const maxDistance = 12; // justera efter typisk maxhastighet
+        const norm = Math.min(distance / maxDistance, 1);
+        const alpha = minAlpha + (maxAlpha - minAlpha) * norm;
+    
+        this.trailGraphics.lineStyle(8, 0xcccccc, alpha);
+        this.trailGraphics.beginPath();
+        this.trailGraphics.moveTo(p1.x, p1.y);
+        this.trailGraphics.lineTo(p2.x, p2.y);
+        this.trailGraphics.strokePath();
+      }
+    };    
+    this.trailGraphics.clear();    
     drawTrail(this.trailPoints.left);
     drawTrail(this.trailPoints.right);
   }
