@@ -7,6 +7,35 @@ export default class StartScene extends Phaser.Scene {
   }
 
   preload() {
+    // Load progress handling
+    this.loadingTextsDestroyed = false;
+    const { width, height } = this.scale;
+
+    this.loadingText = this.add.text(width / 2, height / 2 - 30, 'Loading... 0%', {
+      fontSize: '16px',
+      fill: '#888888',
+      fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5);
+  
+    this.fileText = this.add.text(width / 2, height / 2, '', {
+      fontSize: '10px',
+      fill: '#888888',
+      fontFamily: '"Press Start 2P"'
+    }).setOrigin(0.5);
+  
+    this.load.on('progress', (value) => {
+      if (this.loadingText && !this.loadingTextsDestroyed) {
+        this.loadingText.setText('Loading... ' + Math.round(value * 100) + '%');
+      }
+    });
+  
+    this.load.on('fileprogress', (file) => {
+      if (this.fileText && !this.loadingTextsDestroyed) {
+        this.fileText?.setText(`Loading: ${file?.key || '...'}`);
+      }
+    });
+  
+    // Resources to pre-load
     this.load.image('logo', 'assets/sprites/ski_patrol_logo.png');
     this.load.image('tree', 'assets/sprites/tree.png');
     this.load.image('tree_snowy', 'assets/sprites/tree_snowy.png');
@@ -25,6 +54,12 @@ export default class StartScene extends Phaser.Scene {
   }
 
   create() {
+    
+    // Remove load progress
+    this.loadingText?.destroy();
+    this.fileText?.destroy();
+    this.loadingTextsDestroyed = true;    
+
     this.objects = this.add.group();
     this.scrollSpeed = 2;
     this.difficultyOptions = ['Easy', 'Normal', 'Hard', 'Insane'];
