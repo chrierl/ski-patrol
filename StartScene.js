@@ -28,13 +28,7 @@ export default class StartScene extends Phaser.Scene {
         this.loadingText.setText('Loading... ' + Math.round(value * 100) + '%');
       }
     });
-  
-    this.load.on('fileprogress', (file) => {
-      if (this.fileText && !this.loadingTextsDestroyed) {
-        this.fileText?.setText(`Loading: ${file?.key || '...'}`);
-      }
-    });
-  
+    
     // Resources to pre-load
     this.load.image('logo', 'assets/sprites/ski_patrol_logo.png');
     this.load.image('tree', 'assets/sprites/tree.png');
@@ -57,7 +51,6 @@ export default class StartScene extends Phaser.Scene {
     
     // Remove load progress
     this.loadingText?.destroy();
-    this.fileText?.destroy();
     this.loadingTextsDestroyed = true;    
 
     this.objects = this.add.group();

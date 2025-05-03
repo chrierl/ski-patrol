@@ -273,14 +273,14 @@ update(time, delta) {
       if (Phaser.Math.FloatBetween(0, 1) < this.adjustedObstacleChance) {
         const def = weightedPick(obstacleDefs);
         const conf = def.config();
-        conf.height = Phaser.Math.Between(this.scale.height + 50, this.scale.height + 150);
+        conf.height = Phaser.Math.Between(this.scale.height + 100, this.scale.height + 200);
         this.createObstacle(conf);
       }
   
       if (Phaser.Math.FloatBetween(0, 1) < this.adjustedCollectibleChance) {
         const def = weightedPick(collectibleDefs);
         const conf = def.config();
-        conf.height = Phaser.Math.Between(this.scale.height + 50, this.scale.height + 150);
+        conf.height = Phaser.Math.Between(this.scale.height + 100, this.scale.height + 200);
         this.createCollectible(conf);
       }
     }
@@ -538,7 +538,7 @@ update(time, delta) {
   
     } else {
       // 😢 Inget rekord
-      this.add.text(centerX, centerY - 20, 'BETTER LUCK NEXT TIME!', {
+      this.add.text(centerX, centerY - 20, this.getRandomTaunt(), {
         fontSize: '14px', fill: '#FFFFFF', fontFamily: '"Press Start 2P"'
       }).setOrigin(0.5).setDepth(1001);
   
@@ -596,6 +596,44 @@ update(time, delta) {
     sprite.timeBonus = config.timeBonus;
     sprite.customHitbox = config.hitbox;
     this.collectibles.add(sprite);
+  }
+
+  getRandomTaunt() {
+    const taunts = [
+      "You call that a run?",
+      "Try using both skis next time.",
+      "Even the reindeer laughed.",
+      "Did you mean to do that?",
+      "Wow... just wow.",
+      "Your score called. It's ashamed.",
+      "There's a newbie class starting Monday.",
+      "Are you even trying? Really?!",
+      "Do you have to hit *every* tree?",
+      "Do you have an anti-twin? Who is fast?",
+      "Well that did not deescalate quickly.",
+      "You know there is no speed limit, right?",
+      "If you were any slower you'd stand still.",
+      "I've seen snowmen ski better.",
+      "You give new mening to the word slow.",
+      "Your skis called. They quit!",
+      "Well, this is for people that can ski.",
+      "We're not mad. Just very disappointed.",
+      "Are you skiing or sightseeing?",
+      "I hope no one else saw that run.",
+      "That was the definition of embarrassing.",
+      "A friendly advice: never try this again.",
+      "You were unable to find the controls?",
+      "At least high marks for style (no, lying).",
+      "You looked good on the starting line.",
+      "Please. Just. Stop",
+      "Maybe curling is more your thing?",
+      "I think I'm faster going *up* the mountain.",
+      "The jury has reached a verdict: fail.",
+      "You are the reason ski patrol exists.",
+      "Welcome to the pinnacle of 'meh'."
+    ];
+  
+    return Phaser.Utils.Array.GetRandom(taunts);
   }
 
   textStyle() {

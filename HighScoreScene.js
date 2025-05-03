@@ -119,7 +119,6 @@ export default class HighScoreScene extends Phaser.Scene {
     scores.forEach((entry, i) => {
       const rank = `${i + 1}.`.padStart(4, ' ');
       const name = (entry.name || '---').trim().padEnd(12, ' ');
-      console.log('Cat: ' + categoryLabel + " Name: !" + entry.name + "!");
       const val = this.formatScore(categoryLabel, entry.value);
       const text = `${rank} ${name} ${val}`;
       
