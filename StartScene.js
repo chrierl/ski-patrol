@@ -86,7 +86,7 @@ export default class StartScene extends Phaser.Scene {
 
     // Read stored skier from settings in localstorage
     const storedSkier = JSON.parse(localStorage.getItem('selectedSkier'));
-    const skierImageBase = storedSkier?.base || 'skiers/skier';
+    const skierImageBase = storedSkier?.base || 'skiers/joe/joe';
     const skierTextureKey = 'current_skier';
 
     if (this.textures.exists(skierTextureKey)) {

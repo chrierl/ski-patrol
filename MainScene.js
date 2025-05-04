@@ -62,19 +62,19 @@ export default class MainScene extends Phaser.Scene {
     this.scheduleNextAmbient();
 
     // Load skier sprites
-    let skierBase = 'skiers/skier'; // fallback
+    this.skierBase = 'skiers/joe/joe'; // fallback
     try {
       const saved = JSON.parse(localStorage.getItem('selectedSkier'));
-      if (saved?.base) skierBase = saved.base;
+      if (saved?.base) this.skierBase = saved.base;
     } catch (e) {
       console.warn('⚠️ Could not parse saved skier');
     }
   
     const loader = this.load;
-    loader.image('skier', `assets/${skierBase}.png`);
-    loader.image('skier_left', `assets/${skierBase}_left.png`);
-    loader.image('skier_right', `assets/${skierBase}_right.png`);
-    loader.image('skier_crash', `assets/${skierBase}_crash.png`);
+    loader.image('skier', `assets/${this.skierBase}.png`);
+    loader.image('skier_left', `assets/${this.skierBase}_left.png`);
+    loader.image('skier_right', `assets/${this.skierBase}_right.png`);
+    loader.image('skier_crash', `assets/${this.skierBase}_crash.png`);
 
     this.trailGraphics = this.add.graphics().setDepth(0);
     this.trailPoints = { left: [], right: [] }; // Buffert för båda spår
@@ -86,12 +86,10 @@ export default class MainScene extends Phaser.Scene {
     const saved = JSON.parse(localStorage.getItem('selectedSong'));
     const musicFile = saved?.file || 'ski_patrol_theme.mp3';
     const musicKey = musicFile.replace('.mp3', '');
-    
-    this.musicKey = musicKey; // spara för senare
-    
+    this.musicKey = musicKey;
     this.load.audio(musicKey, `assets/${musicFile}`);
     
-    // När laddning är klar, kör initGame
+    // Wait to start the game until everything has loaded
     this.load.once('complete', () => {
       this.initGame();
     });
@@ -563,7 +561,10 @@ update(time, delta) {
           const name = prompt('Enter your name:');
           if (name) {
             for (const score of newScores) {
-              await highScoreManager.saveScore({ ...score, name: name.substring(0, 12).trim() });
+              await highScoreManager.saveScore({ 
+                ...score, 
+                name: name.substring(0, 12).trim(),
+                skierBase: this.skierBase });
             }
             this.scene.start('HighScoreScene');
           }
@@ -582,7 +583,10 @@ update(time, delta) {
             this.inputText += event.key;
           } else if (event.key === 'Enter') {
             for (const score of newScores) {
-              await highScoreManager.saveScore({ ...score, name: this.inputText.trim() });
+              await highScoreManager.saveScore({ 
+                ...score, 
+                  name: this.inputText.trim(),
+                  skierBase: this.skierBase });
             }
             this.scene.start('HighScoreScene');
           }

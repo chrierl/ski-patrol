@@ -27,9 +27,14 @@ export default class HighScoreManager {
     return scores.length < this.maxEntries || value > scores[scores.length - 1].value;
   }
   
-  async saveScore({ category, name, value, timestamp = Date.now() }) {
+  async saveScore({ category, name, value, skierBase, timestamp = Date.now() }) {
     const localScores = this.getLocalHighScores(category);
-    const newScore = { name: name || '???', value, timestamp };
+    const newScore = {
+      name: name || '???',
+      value,
+      timestamp,
+      ...(skierBase && { skierBase }) // lägg till bara om det finns
+    };
   
     // Spara lokalt om det kvalificerar
     if (await this.isLocalRecord(category, value)) {
@@ -49,7 +54,6 @@ export default class HighScoreManager {
       await addDoc(colRef, newScore);
     }
   }
-
   getLocalHighScores(category) {
     const raw = localStorage.getItem(this.localStoragePrefix + category);
     return raw ? JSON.parse(raw) : [];

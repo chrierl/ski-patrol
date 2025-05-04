@@ -48,19 +48,19 @@ export default class HighScoreScene extends Phaser.Scene {
     const width = this.scale.width;
     const height = this.scale.height;
   
-    const title = this.add.text(width / 2, 80, 'HIGH SCORES', {
+    const title = this.add.text(width / 2, 40, 'HIGH SCORES', {
       fontSize: '24px',
       fill: '#E34234',
       fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5);
     this.highscoreTexts.push(title);
   
-    const labelLocal = this.add.text(width / 2 - 100, 130, 'LOCAL', {
+    const labelLocal = this.add.text(width / 2 - 100, 80, 'LOCAL', {
       fontSize: '14px',
       fill: this.showingGlobal ? '#888' : '#E34234',
       fontFamily: '"Press Start 2P"'
     }).setOrigin(0.5);
-    const labelGlobal = this.add.text(width / 2 + 100, 130, 'GLOBAL', {
+    const labelGlobal = this.add.text(width / 2 + 100, 80, 'GLOBAL', {
       fontSize: '14px',
       fill: this.showingGlobal ? '#E34234' : '#888',
       fontFamily: '"Press Start 2P"'
@@ -78,12 +78,12 @@ export default class HighScoreScene extends Phaser.Scene {
       if (!isMobileDevice) {
         // Desktop = horizontal layout
         const x = (width / 2) + (index - 1) * 300;
-        const y = 160;
+        const y = 120;
         this.drawScoreList(cat.label, scores, x, y);
       } else {
         // Mobile = vertical layout
         const x = width / 2;
-        const y = 160 + index * 200;
+        const y = 120 + index * 150;
         this.drawScoreList(cat.label, scores, x, y);
       }
     });
@@ -111,7 +111,7 @@ export default class HighScoreScene extends Phaser.Scene {
 
   drawScoreList(categoryLabel, scores, startX, startY) {
     const title = this.add.text(startX, startY, categoryLabel, {
-      fontSize: '12px', fill: '#020202', fontFamily: '"Press Start 2P"'
+      fontSize: '10px', fill: '#020202', fontFamily: '"Press Start 2P"' //12px
     }).setOrigin(0.5);
   
     this.highscoreTexts.push(title);
@@ -122,10 +122,10 @@ export default class HighScoreScene extends Phaser.Scene {
       const val = this.formatScore(categoryLabel, entry.value);
       const text = `${rank} ${name} ${val}`;
       
-      const y = startY + 20 + i * 16;
+      const y = startY + 20 + i * 12;
   
       const scoreText = this.add.text(startX, y, text, {
-        fontSize: '10px', fill: '#020202', fontFamily: '"Press Start 2P"'
+        fontSize: '8px', fill: '#020202', fontFamily: '"Press Start 2P"' // 10px
       }).setOrigin(0.5, 0.5).setAlpha(0);
   
       this.tweens.add({
