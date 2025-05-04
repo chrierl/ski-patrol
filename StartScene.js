@@ -38,10 +38,20 @@ export default class StartScene extends Phaser.Scene {
     this.load.image('cabin', 'assets/sprites/cabin.png');
     this.load.image('rock_narrow', 'assets/sprites/rock_narrow.png');
     this.load.image('snowman', 'assets/sprites/snowman.png');
+    this.load.image('simon', 'assets/sprites/simon.png');
     this.load.image('groomer', 'assets/sprites/groomer.png');
+    this.load.image('snowmobile_red', 'assets/sprites/snowmobile_red.png');
+    this.load.image('snowmobile_yellow', 'assets/sprites/snowmobile_yellow.png');
     this.load.image('can', 'assets/sprites/can.png');
     this.load.image('bottle', 'assets/sprites/bottle.png');
     this.load.image('pole', 'assets/sprites/pole.png');
+    this.load.image('ski_pass', 'assets/sprites/ski_pass.png');
+    this.load.image('mobile', 'assets/sprites/mobile.png');
+    this.load.image('bird', 'assets/sprites/bird.png');
+    this.load.image('hang_glider', 'assets/sprites/hang_glider.png');
+    this.load.image('hang_glider', 'assets/sprites/hang_glider_sp.png');
+    this.load.image('fog', 'assets/sprites/fog.png');
+    this.load.image('chopper', 'assets/sprites/chopper.png');
     this.load.audio('music_start', 'assets/audio/unfinished_paths.mp3');
     this.load.audio('music_game', 'assets/audio/ski_patrol_theme.mp3');
     this.load.audio('pickup', 'assets/audio/pickup.wav');
@@ -86,7 +96,8 @@ export default class StartScene extends Phaser.Scene {
 
     // Read stored skier from settings in localstorage
     const storedSkier = JSON.parse(localStorage.getItem('selectedSkier'));
-    const skierImageBase = storedSkier?.base || 'skiers/joe/joe';
+    const defaultSkierBase = 'skiers/joe/joe';
+    const skierImageBase = storedSkier?.base || defaultSkierBase;
     const skierTextureKey = 'current_skier';
 
     if (this.textures.exists(skierTextureKey)) {

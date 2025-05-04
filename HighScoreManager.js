@@ -54,6 +54,7 @@ export default class HighScoreManager {
       await addDoc(colRef, newScore);
     }
   }
+  
   getLocalHighScores(category) {
     const raw = localStorage.getItem(this.localStoragePrefix + category);
     return raw ? JSON.parse(raw) : [];

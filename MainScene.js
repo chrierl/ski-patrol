@@ -29,7 +29,7 @@ export default class MainScene extends Phaser.Scene {
     this.ready = false;
     this.score = 0;
     this.distance = 0;
-    this.scrollSpeedY = 2;
+    this.scrollSpeedY = 2; // Start speeds
     this.lateralSpeed = 0;
     this.touchDirection = 0; // -1 for left, 0 for straight, 1 for right
     this.touchSpeedChange = 0; // -1 for slower, 0 for same, 1 for faster   
@@ -323,16 +323,15 @@ update(time, delta) {
     const ambientDefs = objectConfigs.filter(o => o.type === 'ambient');
     const def = weightedPick(ambientDefs);
     const conf = def.config();
-  
     const startX = conf.direction === 'left' ? this.scale.width + 50 : -50;  
     const ambient = this.add.sprite(startX, conf.y, def.sprite)
       .setScale(conf.scale)
-      .setDepth(2000); // or whatever fits
+      .setDepth(2000);
 
       if (conf.direction === 'left') {
         ambient.flipX = true;
       }
-  
+
     this.tweens.add({
       targets: ambient,
       x: conf.direction === 'left' ? -100 : this.scale.width + 100,
@@ -437,6 +436,30 @@ update(time, delta) {
 
       // Obstacles
       this.obstacles.getChildren().forEach(obj => {
+        const box = obj.customHitbox;
+        const bounds = new Phaser.Geom.Rectangle(
+          obj.x - obj.displayWidth / 2 + obj.displayWidth * box.x,
+          obj.y - obj.displayHeight / 2 + obj.displayHeight * box.y,
+          obj.displayWidth * box.width,
+          obj.displayHeight * box.height
+        );
+        // Hitbox
+        this.debugGraphics.lineStyle(2, 0xff0000, 1);
+        this.debugGraphics.strokeRectShape(bounds);
+
+        // Object
+        const fullBounds = new Phaser.Geom.Rectangle(
+          obj.x - obj.displayWidth / 2,
+          obj.y - obj.displayHeight / 2,
+          obj.displayWidth,
+          obj.displayHeight
+        );
+        this.debugGraphics.lineStyle(1, 0xaaaa22, 0.8);
+        this.debugGraphics.strokeRectShape(fullBounds);
+      });
+
+      // Collectibles
+      this.collectibles.getChildren().forEach(obj => {
         const box = obj.customHitbox;
         const bounds = new Phaser.Geom.Rectangle(
           obj.x - obj.displayWidth / 2 + obj.displayWidth * box.x,
