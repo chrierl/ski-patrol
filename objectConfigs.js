@@ -280,7 +280,7 @@ export const objectConfigs = [
       sprite: 'bird',
       weight: 10,
       config: () => ({
-        scale: 0.08,
+        scale: Phaser.Math.FloatBetween(0.07, 0.12),
         speed: Phaser.Math.Between(2, 5),
         direction: Math.random() < 0.5 ? 'left' : 'right',
         y: Phaser.Math.Between(100, 300),
@@ -291,7 +291,7 @@ export const objectConfigs = [
       sprite: 'chopper',
       weight: 3,
       config: () => ({
-        scale: 0.30,
+        scale: Phaser.Math.FloatBetween(0.3, 0.45),
         speed: Phaser.Math.Between(2, 5),
         direction: Math.random() < 0.5 ? 'left' : 'right',
         y: Phaser.Math.Between(100, 300),
@@ -302,7 +302,7 @@ export const objectConfigs = [
       sprite: 'hang_glider',
       weight: 2,
       config: () => ({
-        scale: 0.25,
+        scale: Phaser.Math.FloatBetween(0.20, 0.5),
         speed: Phaser.Math.Between(1, 3),
         direction: Math.random() < 0.5 ? 'left' : 'right',
         y: Phaser.Math.Between(100, 300),
@@ -313,7 +313,7 @@ export const objectConfigs = [
       sprite: 'hang_glider_sp',
       weight: 3,
       config: () => ({
-        scale: 0.25,
+        scale: Phaser.Math.FloatBetween(0.20, 0.5),
         speed: Phaser.Math.Between(1, 3),
         direction: Math.random() < 0.5 ? 'left' : 'right',
         y: Phaser.Math.Between(100, 300),

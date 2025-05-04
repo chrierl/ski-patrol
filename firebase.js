@@ -24,14 +24,6 @@ export async function uploadGlobalScore(category, name, value) {
   const colRef = collection(db, 'highscores', platform, category);
   const timestamp = Date.now();
 
-  console.log(`🌍 Uploading global score to Firestore:
-  📂 Platform: ${platform}
-  🏷️ Category: ${category}
-  👤 Name: ${name}
-  📈 Value: ${value}
-  ⏰ Timestamp: ${timestamp}
-  📁 Collection path: highscores/${platform}/${category}`);
-
   try {
     await addDoc(colRef, { name, value, timestamp });
     console.log('✅ Upload successful!');

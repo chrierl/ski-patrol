@@ -3,6 +3,7 @@ import { objectConfigs, weightedPick } from './objectConfigs.js';
 import { addTouchControlGrid } from './TouchControls.js';
 import { highScoreManager } from './game.js';
 import { isMobile, createButton } from './helpers.js';
+import gameSettings from './gameSettings.js';
 
 function textStyle() {
     return {
@@ -29,34 +30,25 @@ export default class MainScene extends Phaser.Scene {
     this.ready = false;
     this.score = 0;
     this.distance = 0;
-    this.scrollSpeedY = 2; // Start speeds
+    this.scrollSpeedY = gameSettings.startSpeed;
     this.lateralSpeed = 0;
     this.touchDirection = 0; // -1 for left, 0 for straight, 1 for right
     this.touchSpeedChange = 0; // -1 for slower, 0 for same, 1 for faster   
     this.collisionDisabled = false;
     this.gamePaused = false;
     this.gameOver = false;
-    this.minSpeed = 2;
-    this.maxSpeed = 10;
+    this.minSpeed = gameSettings.minSpeed;
+    this.maxSpeed = gameSettings.maxSpeed;
     this.elapsedTimeMs = 0;
-    this.remainingTimeMs = 30 * 1000;
+    this.remainingTimeMs = gameSettings.timeFromStart;
     this.spawnAccumulator = 0;
     this.spawnPadding = 10;
-    const referenceWidth = 680; // original width
+    const referenceWidth = gameSettings.referenceWidth;
     const widthScaleFactor = this.scale.width / referenceWidth;
 
-    const difficultyMap = {
-      Easy:    { obstacle: 0.05, collectible: 0.05 },
-      Normal:  { obstacle: 0.07, collectible: 0.05 },
-      Hard:    { obstacle: 0.10, collectible: 0.04 },
-      Insane:  { obstacle: 0.15, collectible: 0.03 }
-    };
-
     // Spawn settings
-    const difficulty = data.difficulty || 'Normal';
-    const settings = difficultyMap[difficulty];
-    this.obstacleSpawnChance = settings.obstacle;
-    this.collectibleSpawnChance = settings.collectible;
+    this.obstacleSpawnChance = gameSettings.obstacleSpawnChance;
+    this.collectibleSpawnChance = gameSettings.collectibleSpawnChance;
     this.adjustedObstacleChance = this.obstacleSpawnChance * widthScaleFactor;
     this.adjustedCollectibleChance = this.collectibleSpawnChance * widthScaleFactor;
     this.scheduleNextAmbient();
@@ -134,7 +126,7 @@ initGame() {
           columns: [0.3, 0.4, 0.3],
           rows: [0.3, 0.4, 0.3],
           controlHeightPercent: 0.4,
-          controlWidthPercent:0.8,
+          controlWidthPercent:0.9,
           verticalOffset: 30,
           alpha: 0.10
         });
@@ -485,6 +477,19 @@ update(time, delta) {
   }
 
   triggerPause() {
+    // Calculate dynamic freeze time
+    const freezeTime = Phaser.Math.Linear(
+      gameSettings.minCrashFreeze,
+      gameSettings.maxCrashFreeze,
+      (this.scrollSpeedY - gameSettings.minSpeed) / (gameSettings.maxSpeed - gameSettings.minSpeed)
+    );
+    console.log('Speed        : ', this.scrollSpeedY);
+    console.log('minFreeze    :', gameSettings.minCrashFreeze);
+    console.log('maxFreeze', gameSettings.maxCrashFreeze);
+    console.log('Min speed    : ', gameSettings.minSpeed);
+    console.log('Max speed    : ', gameSettings.maxSpeed);  
+    console.log('Freeze time: ', freezeTime);
+
     this.gamePaused = true;
     this.collisionDisabled = false;
     this.scrollSpeedY = 0;
@@ -495,7 +500,6 @@ update(time, delta) {
     this.crashSkier.setPosition(this.player.x, this.player.y);
     this.stars.setPosition(this.player.x, this.player.y - 20);
     this.player.setVisible(false);
-
     this.sound.play('crash');
 
     setTimeout(() => {
@@ -513,7 +517,7 @@ update(time, delta) {
           this.player.visible = !this.player.visible;
         }
       });
-    }, 2000);
+    }, freezeTime);
 
     setTimeout(() => {
       this.collisionDisabled = false;
@@ -522,7 +526,7 @@ update(time, delta) {
         this.blinkTimer = null;
       }
       this.player.setVisible(true);
-    }, 5000);
+    }, gameSettings.invincibilityTime);
   }
 
   async endGame() {
