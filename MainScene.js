@@ -25,6 +25,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create(data = {}) {
+    this.debugEnabled = false;
     this.ready = false;
     this.score = 0;
     this.distance = 0;
@@ -118,6 +119,7 @@ initGame() {
     this.obstacles = this.add.group();
     this.collectibles = this.add.group();
     this.debugGraphics = this.add.graphics();
+    this.debugGraphics.setDepth(2000);
 
     this.player = this.add.sprite(this.scale.width / 2, 200, 'skier').setScale(0.1).setDepth(200);
     this.crashSkier = this.add.sprite(this.player.x, this.player.y, 'skier_crash').setScale(0.1).setVisible(false).setDepth(500);
@@ -146,6 +148,19 @@ update(time, delta) {
     if (!this.ready) return; 
     if (this.gameOver) return;
   
+    // For hitbox testing purposes only.
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('D'))) {
+      this.debugEnabled = !this.debugEnabled;
+      if (!this.debugEnabled) {
+        this.debugGraphics.clear();
+      } 
+    }
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('P'))) {
+      this.debugPaused = !this.debugPaused;
+      this.time.paused = this.debugPaused;
+    }
+    if (!this.ready || this.gameOver || this.debugPaused) return;    
+
     // Skip keyboard input if touch input was detected
     const usingTouch = this.sys.game.device.input.touch;
   
@@ -189,10 +204,6 @@ update(time, delta) {
   
     if (this.stars.visible) {
       this.stars.rotation += 0.1;
-    }
-
-    if (!this.debugCircle) {
-      this.debugCircle = this.add.graphics();
     }
   }
   
@@ -347,8 +358,8 @@ update(time, delta) {
 
   checkForCollisions() {
     const skierBounds = new Phaser.Geom.Rectangle(
-      this.player.x - this.player.displayWidth * 0.15,
-      this.player.y - this.player.displayHeight * 0.1,
+      this.player.x + this.player.displayWidth * -0.15,
+      this.player.y + this.player.displayHeight * 0.06,
       this.player.displayWidth * 0.3,
       this.player.displayHeight * 0.3
     );
@@ -363,10 +374,6 @@ update(time, delta) {
       );
 
       if (!this.collisionDisabled && !this.gamePaused && Phaser.Geom.Intersects.RectangleToRectangle(skierBounds, bounds)) {
-        //this.debugGraphics.lineStyle(2, 0x00ff00); // green
-        //this.debugGraphics.strokeRect(skierBounds.x, skierBounds.y, skierBounds.width, skierBounds.height);
-        //this.debugGraphics.lineStyle(2, 0xff0000); // red
-        //this.debugGraphics.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
         this.triggerPause();
       }
     });
@@ -385,7 +392,8 @@ update(time, delta) {
         this.scoreText.setText('Pickups: ' + this.score);
 
         if (obj.timeBonus) {
-          this.remainingTimeMs += obj.timeBonus;
+          const mobileBonus = isMobile() ? 1000 : 0;
+          this.remainingTimeMs += obj.timeBonus + mobileBonus;
           this.timeText.setColor('#E34234');
           this.time.delayedCall(500, () => {
             this.timeText.setColor('#020202');
@@ -420,6 +428,39 @@ update(time, delta) {
         obj.destroy();
       }
     });
+
+    if (this.debugEnabled) {
+      // For hitbox testing purposes only
+      this.debugGraphics.clear();
+
+      // Player
+      this.debugGraphics.lineStyle(2, 0x00ff00); // Grön
+      this.debugGraphics.strokeRectShape(skierBounds);
+
+      // Obstacles
+      this.obstacles.getChildren().forEach(obj => {
+        const box = obj.customHitbox;
+        const bounds = new Phaser.Geom.Rectangle(
+          obj.x - obj.displayWidth / 2 + obj.displayWidth * box.x,
+          obj.y - obj.displayHeight / 2 + obj.displayHeight * box.y,
+          obj.displayWidth * box.width,
+          obj.displayHeight * box.height
+        );
+        // Hitbox
+        this.debugGraphics.lineStyle(2, 0xff0000, 1);
+        this.debugGraphics.strokeRectShape(bounds);
+
+        // Object
+        const fullBounds = new Phaser.Geom.Rectangle(
+          obj.x - obj.displayWidth / 2,
+          obj.y - obj.displayHeight / 2,
+          obj.displayWidth,
+          obj.displayHeight
+        );
+        this.debugGraphics.lineStyle(1, 0xaaaa22, 0.8);
+        this.debugGraphics.strokeRectShape(fullBounds);
+      });
+    }
   }
 
   triggerPause() {
@@ -584,14 +625,28 @@ update(time, delta) {
     const y = this.scale.height + Phaser.Math.Between(50, 150);
     const sprite = this.add.sprite(x, y, config.sprite);
     sprite.setScale(config.scale);
+  
     if (config.rotation) {
-        const angleDeg = Phaser.Math.Between(-config.rotation, config.rotation);
-        sprite.setAngle(angleDeg);
-      }
+      const angleDeg = Phaser.Math.Between(-config.rotation, config.rotation);
+      sprite.setAngle(angleDeg);
+    }
+  
+    // Flip?
+    let flipped = false;
     if (config.mirror && Math.random() < 0.5) {
       sprite.flipX = true;
-    }  
-    sprite.customHitbox = config.hitbox;
+      flipped = true;
+    }
+  
+    // Hitbox
+    const original = config.hitbox;
+    const hitbox = { ...original };
+  
+    if (flipped) {
+      hitbox.x = 1 - original.x - original.width;
+    }
+  
+    sprite.customHitbox = hitbox;
     sprite.setDepth(400);
     this.obstacles.add(sprite);
   }
@@ -627,7 +682,7 @@ update(time, delta) {
       "You know there is no speed limit, right?",
       "If you were any slower you'd stand still.",
       "I've seen snowmen ski better.",
-      "You give new mening to the word slow.",
+      "You give new meaning to the word slow.",
       "Your skis called. They quit!",
       "Well, this is for people that can ski.",
       "We're not mad. Just very disappointed.",
@@ -643,7 +698,10 @@ update(time, delta) {
       "I think I'm faster going *up* the mountain.",
       "The jury has reached a verdict: fail.",
       "You are the reason ski patrol exists.",
-      "Welcome to the pinnacle of 'meh'."
+      "Welcome to the pinnacle of 'meh'.",
+      "Why are you so bad?",
+      "You're worse than the worst."
+
     ];
   
     return Phaser.Utils.Array.GetRandom(taunts);

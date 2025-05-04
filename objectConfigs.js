@@ -4,7 +4,7 @@ export const objectConfigs = [
       sprite: 'tree',
       weight: 20,
       scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
-      hitbox: { x: 0.3, y: 0.50, width: 0.4, height: 0.35 },
+      hitbox: { x: 0.35, y: 0.60, width: 0.3, height: 0.35 },
       mirror: true,
       config() {
         return {
@@ -20,7 +20,7 @@ export const objectConfigs = [
       sprite: 'tree_snowy',
       weight: 15,
       scale: () => Phaser.Math.FloatBetween(0.10, 0.25),
-      hitbox: { x: 0.3, y: 0.50, width: 0.4, height: 0.35 },
+      hitbox: { x: 0.35, y: 0.70, width: 0.3, height: 0.25 },
       mirror: true,
       config() {
         return {
@@ -52,7 +52,7 @@ export const objectConfigs = [
       sprite: 'rock_narrow',
       weight: 8,
       scale: () => Phaser.Math.FloatBetween(0.08, 0.12),
-      hitbox: { x: 0.30, y: 0.4, width: 0.4, height: 0.3 },
+      hitbox: { x: 0.25, y: 0.57, width: 0.50, height: 0.2 },
       mirror: true,
       config() {
         return {
@@ -68,7 +68,7 @@ export const objectConfigs = [
       sprite: 'cabin',
       weight: 2,
       scale: () => 0.25,
-      hitbox: { x: 0.1, y: 0.5, width: 0.8, height: 0.4 },
+      hitbox: { x: 0.1, y: 0.6, width: 0.8, height: 0.3 },
       mirror: true,
       config() {
         return {
@@ -84,7 +84,7 @@ export const objectConfigs = [
       sprite: 'reindeer',
       weight: 2,
       scale: () => 0.14,
-      hitbox: { x: 0.3, y: 0.2, width: 0.4, height: 0.6 },
+      hitbox: { x: 0.20, y: 0.5, width: 0.50, height: 0.4 },
       mirror: true,
       config() {
         return {
@@ -100,7 +100,7 @@ export const objectConfigs = [
       sprite: 'snowman',
       weight: 1,
       scale: () => 0.12,
-      hitbox: { x: 0.3, y: 0.4, width: 0.4, height: 0.5 },
+      hitbox: { x: 0.3, y: 0.55, width: 0.4, height: 0.35 },
       mirror: true,
       config() {
         return {
@@ -116,7 +116,7 @@ export const objectConfigs = [
       sprite: 'groomer',
       weight: 1,
       scale: () => 0.20,
-      hitbox: { x: 0.05, y: 0.5, width: 0.9, height: 0.25 },
+      hitbox: { x: 0.05, y: 0.6, width: 0.9, height: 0.15 },
       mirror: true,
       config() {
         return {

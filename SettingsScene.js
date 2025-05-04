@@ -6,8 +6,9 @@ export default class SettingsScene extends Phaser.Scene {
     super({ key: 'SettingsScene' });
 
     this.skierOptions = [
-        { name: 'Simon', base: 'skiers/skier' },
-        { name: 'Sofia', base: 'skiers/skier_blue' },
+        { name: 'Joe', base: 'skiers/skier' },
+        { name: 'Simon', base: 'skiers/simon' },
+        { name: 'Sofia', base: 'skiers/sofia' },
         { name: 'Vader', base: 'skiers/skier_black' },
         { name: 'Starski', base: 'skiers/starski' },
         { name: 'Stonemark', base: 'skiers/stonemark' },        
