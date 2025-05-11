@@ -28,6 +28,7 @@ export default class HighScoreManager {
   }
   
   async saveScore({ category, name, value, skierBase, timestamp = Date.now() }) {
+    console.log(`[saveScore] Called for ${category}: ${value} by ${name} (${skierBase})`);
     const localScores = this.getLocalHighScores(category);
     const newScore = {
       name: name || '???',

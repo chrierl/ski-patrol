@@ -483,12 +483,6 @@ update(time, delta) {
       gameSettings.maxCrashFreeze,
       (this.scrollSpeedY - gameSettings.minSpeed) / (gameSettings.maxSpeed - gameSettings.minSpeed)
     );
-    console.log('Speed        : ', this.scrollSpeedY);
-    console.log('minFreeze    :', gameSettings.minCrashFreeze);
-    console.log('maxFreeze', gameSettings.maxCrashFreeze);
-    console.log('Min speed    : ', gameSettings.minSpeed);
-    console.log('Max speed    : ', gameSettings.maxSpeed);  
-    console.log('Freeze time: ', freezeTime);
 
     this.gamePaused = true;
     this.collisionDisabled = false;
